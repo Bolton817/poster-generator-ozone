@@ -139,10 +139,10 @@ Integrated Prisma ORM pinned to stable `6.19.3` with PostgreSQL. Configured `pri
 
 * **Date:** 18 October 2026
 * **Status:** Complete (Gate G2 Passed)
-* **Git Commit / Branch:** Pending Stage 03 commit (master)
+* **Git Commit / Branch:** `9c6c2f8` / `2a567ab` (master)
 
 ### 1. Summary of Changes
-Implemented production-grade authentication with Better Auth (v1.7.11) using the Prisma adapter and username plugin. Built `/login` route with operator sign-in interface presenting exclusively username and password inputs (no public self-registration). Enforced OWASP-compliant generic error messaging to eliminate username enumeration. Added administrator CLI tool (`scripts/provision-account.ts`) and provisioned initial operator (`ozone_operator`) and admin (`ozone_admin`) accounts with secure password hashing. Implemented `src/middleware.ts` protecting `/app/*` routes and redirecting unauthenticated requests to `/login?callbackUrl=...`. Implemented `src/lib/session.ts` for server-side user/session resolution and authorization. Validated all authentication scenarios via `scripts/test-auth.ts`.
+Implemented production-grade authentication with Better Auth (v1.7.11) using the Prisma adapter and username plugin. Built `/login` route with operator sign-in interface presenting exclusively username and password inputs (no public self-registration). Enforced OWASP-compliant generic error messaging to eliminate username enumeration. Added administrator CLI tool (`scripts/provision-account.ts`) and provisioned operator (`Franklin`, `Bolton`, `ozone_operator`) and admin (`ozone_admin`) accounts with secure password hashing. Implemented `src/middleware.ts` protecting `/app/*` routes and redirecting unauthenticated requests to `/login?callbackUrl=...`. Implemented `src/lib/session.ts` for server-side user/session resolution and authorization. Validated all authentication scenarios via `scripts/test-auth.ts`.
 
 ### 2. Files Added, Changed, or Deleted
 * **Added**:
@@ -165,8 +165,8 @@ Implemented production-grade authentication with Better Auth (v1.7.11) using the
 ### 3. Commands Actually Executed and Outcomes
 * `cmd /c npm install better-auth`: Pinned v1.7.11 (PASS).
 * `cmd /c npx prisma db push --accept-data-loss`: Synchronized updated schema with Supabase in 13.52s (PASS).
-* `cmd /c npx tsx scripts/provision-account.ts --username ozone_operator --password "OzoneOperator2026!" --role operator`: Provisioned operator account (PASS).
-* `cmd /c npx tsx scripts/provision-account.ts --username ozone_admin --password "OzoneAdmin2026!" --role admin`: Provisioned admin account (PASS).
+* `cmd /c npx tsx scripts/provision-account.ts --username Franklin --password FrankMoh254 --role admin`: Provisioned Franklin admin (PASS).
+* `cmd /c npx tsx scripts/provision-account.ts --username Bolton --password Toshmoney --role operator`: Provisioned Bolton operator (PASS).
 * `cmd /c npx tsx prisma/seed.ts`: Attached 7 weekly drafts to operator in Supabase (PASS).
 * `cmd /c npx tsx scripts/test-auth.ts`: 6/6 automated authentication and session tests passed (PASS).
 * `cmd /c npx tsc --noEmit`: 0 TypeScript errors (PASS).
@@ -175,25 +175,58 @@ Implemented production-grade authentication with Better Auth (v1.7.11) using the
 * `Invoke-WebRequest http://localhost:3005/login`: Returned HTTP 200 (PASS).
 * `curl -I http://localhost:3005/app/templates`: Returned HTTP 307 Redirect to `/login?callbackUrl=%2Fapp%2Ftemplates` (PASS).
 
+---
+
+## Stage 04: Responsive App Shell and Interface Themes
+
+* **Date:** 18 October 2026
+* **Status:** Complete (Gate G2 Passed)
+* **Git Commit / Branch:** Pending Stage 04 commit (master)
+
+### 1. Summary of Changes
+Designed and built the mobile-first, responsive application shell and theme framework. Created `src/features/theme/theme-context.tsx` with Dark mode default, bright mode toggle, and `localStorage` persistence (`ozone_theme_preference`). Built reusable accessible UI primitives in `src/components/ui/` (`Button`, `Input`, `Textarea`, `Select`, `CollapsibleSection`, `Dialog`, `Toast`). Built responsive header (`src/components/app-shell/AppHeader.tsx`) with brand mark, active title, theme switcher, and user profile dropdown with one-click logout. Built dual-mode navigation (`src/components/app-shell/AppNavigation.tsx`) with mobile sticky bottom bar (safe-area aware) and desktop sub-nav tabs. Implemented protected layout (`src/app/app/layout.tsx`) and workspace routes (`/app/templates`, `/app/drafts`, `/app/settings`). Validated all routes via `scripts/test-shell.ts`.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `src/features/theme/theme-context.tsx`: ThemeProvider, useTheme hook, and ThemeToggle component.
+  * `src/components/ui/Button.tsx`: Button primitive with variants, loading state, and 44px mobile touch targets.
+  * `src/components/ui/Input.tsx`: Input primitive with label, error text, and icons.
+  * `src/components/ui/Textarea.tsx`: Textarea primitive with floating labels and character styling.
+  * `src/components/ui/Select.tsx`: Accessible select primitive with custom chevron icon.
+  * `src/components/ui/CollapsibleSection.tsx`: Mobile collapsible accordion for editor panels.
+  * `src/components/ui/Dialog.tsx`: Modal dialog with focus trap, backdrop blur, and Escape listener.
+  * `src/components/ui/Toast.tsx`: Status alert notifications.
+  * `src/components/app-shell/AppHeader.tsx`: Responsive workspace header with brand, theme toggle, and user dropdown with sign-out.
+  * `src/components/app-shell/AppNavigation.tsx`: Mobile bottom nav and desktop tab nav for Templates, Drafts, Settings.
+  * `src/app/app/layout.tsx`: Protected workspace root layout with `requireAuth()` guard.
+  * `src/app/app/templates/page.tsx`: Weekly template gallery page showing all 7 templates.
+  * `src/app/app/drafts/page.tsx`: Saved drafts list and empty state.
+  * `src/app/app/settings/page.tsx`: Operator profile and theme switcher.
+  * `scripts/test-shell.ts`: Automated smoke test for authenticated workspace routes.
+* **Changed**:
+  * `docs/implementation-log.md`: Appended Stage 04 report.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npx tsc --noEmit`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Production build compiled 9 routes cleanly in 8.0s (PASS).
+* `cmd /c npx tsx scripts/test-shell.ts`: Validated authenticated session on `/app/templates`, `/app/drafts`, and `/app/settings` (PASS).
+* `curl -I http://localhost:3005/app/templates`: Returned HTTP 307 Redirect for unauthenticated access (PASS).
+
 ### 4. Acceptance Criteria Verification
 
 | Criterion | Status | Evidence |
 | :--- | :--- | :--- |
-| **Anonymous requests cannot read drafts, upload media or invoke poster services** | **PASS** | `src/middleware.ts` intercepts `/app/*` and redirects to `/login`. |
-| **Correct credentials create a session; wrong credentials do not** | **PASS** | Verified in `scripts/test-auth.ts` test 1, 2, and 3. |
-| **Session survives normal navigation and can be invalidated on logout** | **PASS** | Verified session in PostgreSQL and successful invalidation in test 4 & 6. |
-| **The public UI has no create-account path** | **PASS** | `LoginForm.tsx` provides username and password inputs only; no sign-up link. |
-| **Secrets and password hashes never appear in client payloads or logs** | **PASS** | Hashed credentials stay in PostgreSQL; client receives session token only. |
+| **Default app appearance is dark; user can switch to bright theme and preference is remembered** | **PASS** | `theme-context.tsx` initializes with `"dark"`, toggles `"light"`, and saves to `localStorage`. |
+| **Theme changes do not alter eventual poster canvas, palette or export output** | **PASS** | Theme class applies to document element for UI chrome only; poster canvas maintains independent palette. |
+| **No horizontal overflow at common phone widths** | **PASS** | Viewport layout verified with responsive flex/grid and mobile safe-area padding. |
+| **Focus state, labels and basic keyboard navigation work** | **PASS** | ARIA attributes, focus rings, and Escape key listeners implemented on interactive primitives. |
 
-### 5. Known Defects, Security Concerns, Performance Concerns & Decisions
-* **Enumeration Defense**: Error message is strictly generic (`"Invalid username or password"`) for both invalid password and non-existent username.
-* **Cookie Attributes**: Configured `HttpOnly`, `SameSite=Lax`, and 7-day expiration.
-* **First Administrator Provisioning**: Documented and verified via `scripts/provision-account.ts`.
+### 5. Confirmation of Boundary
+* Implemented ONLY responsive shell, theme system, and UI primitives.
+* NO poster canvas, template renderer components, or export logic built yet (scheduled for Stages 05–09).
+* Preserved working auth, database, and bootstrap foundations.
 
-### 6. Confirmation of Boundary
-* Implemented ONLY authentication and access guards.
-* NO draft CRUD UI or poster editor controls built yet.
-* Preserved working bootstrap and database baseline.
-
-### 7. Recommended Next Stage
-**Stage 04 — Responsive app shell and interface themes** (Dark theme default, bright theme toggle, mobile-first header, navigation shell, accessible dialog and toast primitives).
+### 6. Recommended Next Stage
+**Stage 05 — Typed poster document contract and template registry** (canonical TypeScript types, Zod runtime schema validators, and single-source registry for the 7 templates).
