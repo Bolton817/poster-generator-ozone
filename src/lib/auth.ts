@@ -8,7 +8,16 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   secret: process.env.AUTH_SECRET,
-  baseURL: process.env.APP_BASE_URL || "http://localhost:3000",
+  baseURL: process.env.APP_BASE_URL || "http://localhost:3005",
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "operator",
+        input: false,
+      },
+    },
+  },
   plugins: [
     username(),
   ],
