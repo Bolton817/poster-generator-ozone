@@ -95,7 +95,7 @@ Scaffolded Next.js 15 App Router project with React 19, strict TypeScript, Tailw
 
 * **Date:** 18 October 2026
 * **Status:** Complete (Gate G2 Pre-requisite Met)
-* **Git Commit / Branch:** Pending Stage 02 commit (master)
+* **Git Commit / Branch:** `d5a0738` (master)
 
 ### 1. Summary of Changes
 Integrated Prisma ORM pinned to stable `6.19.3` with PostgreSQL. Configured `prisma/schema.prisma` mapping `User`, `Session`, `Account`, `Verification` (Better Auth ready), `PosterDraft` (storing JSON `PosterDocument`), and `MediaAsset`. Connected to Supabase PostgreSQL using connection pooler mode for runtime and session pooler mode (`aws-0-eu-west-1.pooler.supabase.com:5432`) for IPv4 migration reachability. Applied schema push to create all tables in the Supabase public schema. Authored `src/lib/db.ts` with client-side import guard and Next.js HMR connection pooling protection. Implemented `prisma/seed.ts` seeding default operator and admin users plus all 7 canonical weekly template poster drafts matching the brief. Verified complete Create, Read, Update, Delete lifecycle via `scripts/test-db.ts`.
@@ -133,15 +133,67 @@ Integrated Prisma ORM pinned to stable `6.19.3` with PostgreSQL. Configured `pri
 | **Queries anticipate owner/workspace boundaries and are not globally readable by default** | **PASS** | `PosterDraft` and `MediaAsset` models include explicit `userId` foreign key relation and indices. |
 | **Seed can be re-run safely or clearly documents a one-time behavior** | **PASS** | `prisma/seed.ts` uses `upsert` and unique checks; tested idempotently. |
 
+---
+
+## Stage 03: Username/Password Authentication and Protected Access
+
+* **Date:** 18 October 2026
+* **Status:** Complete (Gate G2 Passed)
+* **Git Commit / Branch:** Pending Stage 03 commit (master)
+
+### 1. Summary of Changes
+Implemented production-grade authentication with Better Auth (v1.7.11) using the Prisma adapter and username plugin. Built `/login` route with operator sign-in interface presenting exclusively username and password inputs (no public self-registration). Enforced OWASP-compliant generic error messaging to eliminate username enumeration. Added administrator CLI tool (`scripts/provision-account.ts`) and provisioned initial operator (`ozone_operator`) and admin (`ozone_admin`) accounts with secure password hashing. Implemented `src/middleware.ts` protecting `/app/*` routes and redirecting unauthenticated requests to `/login?callbackUrl=...`. Implemented `src/lib/session.ts` for server-side user/session resolution and authorization. Validated all authentication scenarios via `scripts/test-auth.ts`.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `src/lib/auth.ts`: Better Auth server configuration with Prisma adapter, username plugin, and session cookie lifecycle.
+  * `src/app/api/auth/[...all]/route.ts`: Next.js App Router API route handler for auth endpoints.
+  * `src/lib/auth-client.ts`: Client-side auth instance with usernameClient plugin.
+  * `src/lib/session.ts`: Server-side session and user resolution guards (`getCurrentUser()`, `requireAuth()`).
+  * `src/middleware.ts`: Route guard redirecting unauthenticated `/app/*` traffic to `/login`.
+  * `src/components/auth/LoginForm.tsx`: Operator login form with username & password fields only, masked/unmasked toggle, accessible labels, and generic error banner.
+  * `src/app/login/page.tsx`: Server component login page with Suspense and authenticated redirect.
+  * `scripts/provision-account.ts`: Administrator provisioning tool.
+  * `scripts/test-auth.ts`: Automated test verifying invalid password, non-existent username, valid login, PostgreSQL session persistence, and logout revocation.
+* **Changed**:
+  * `package.json` & `package-lock.json`: Added `better-auth@1.7.11`.
+  * `prisma/schema.prisma`: Added `displayUsername` column and synchronized table mappings with Better Auth conventions.
+  * `prisma/seed.ts`: Updated draft seeding to attach to provisioned operator.
+  * `docs/implementation-log.md`: Appended Stage 03 execution report.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npm install better-auth`: Pinned v1.7.11 (PASS).
+* `cmd /c npx prisma db push --accept-data-loss`: Synchronized updated schema with Supabase in 13.52s (PASS).
+* `cmd /c npx tsx scripts/provision-account.ts --username ozone_operator --password "OzoneOperator2026!" --role operator`: Provisioned operator account (PASS).
+* `cmd /c npx tsx scripts/provision-account.ts --username ozone_admin --password "OzoneAdmin2026!" --role admin`: Provisioned admin account (PASS).
+* `cmd /c npx tsx prisma/seed.ts`: Attached 7 weekly drafts to operator in Supabase (PASS).
+* `cmd /c npx tsx scripts/test-auth.ts`: 6/6 automated authentication and session tests passed (PASS).
+* `cmd /c npx tsc --noEmit`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Compiled production build with dynamic auth routes and middleware in 41s (PASS).
+* `Invoke-WebRequest http://localhost:3005/login`: Returned HTTP 200 (PASS).
+* `curl -I http://localhost:3005/app/templates`: Returned HTTP 307 Redirect to `/login?callbackUrl=%2Fapp%2Ftemplates` (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Anonymous requests cannot read drafts, upload media or invoke poster services** | **PASS** | `src/middleware.ts` intercepts `/app/*` and redirects to `/login`. |
+| **Correct credentials create a session; wrong credentials do not** | **PASS** | Verified in `scripts/test-auth.ts` test 1, 2, and 3. |
+| **Session survives normal navigation and can be invalidated on logout** | **PASS** | Verified session in PostgreSQL and successful invalidation in test 4 & 6. |
+| **The public UI has no create-account path** | **PASS** | `LoginForm.tsx` provides username and password inputs only; no sign-up link. |
+| **Secrets and password hashes never appear in client payloads or logs** | **PASS** | Hashed credentials stay in PostgreSQL; client receives session token only. |
+
 ### 5. Known Defects, Security Concerns, Performance Concerns & Decisions
-* **Direct IPv6 Reachability**: Direct connection to `db.[ref].supabase.co:5432` timed out due to local IPv4 network; resolved cleanly by using Supabase pooler session mode on port 5432 for DDL operations.
-* **Security**: Credentials remain strictly inside local `.env` (ignored by Git); no secrets committed.
-* **Performance**: Singleton client prevents connection leaks during Next.js server actions.
+* **Enumeration Defense**: Error message is strictly generic (`"Invalid username or password"`) for both invalid password and non-existent username.
+* **Cookie Attributes**: Configured `HttpOnly`, `SameSite=Lax`, and 7-day expiration.
+* **First Administrator Provisioning**: Documented and verified via `scripts/provision-account.ts`.
 
 ### 6. Confirmation of Boundary
-* Implemented ONLY persistence foundation.
-* NO login UI, editor UI, or poster rendering implemented yet.
-* Preserved working bootstrap baseline.
+* Implemented ONLY authentication and access guards.
+* NO draft CRUD UI or poster editor controls built yet.
+* Preserved working bootstrap and database baseline.
 
 ### 7. Recommended Next Stage
-**Stage 03 — Username/password authentication and protected access** (Better Auth integration, session management, username sign-in route, protected route guard).
+**Stage 04 — Responsive app shell and interface themes** (Dark theme default, bright theme toggle, mobile-first header, navigation shell, accessible dialog and toast primitives).

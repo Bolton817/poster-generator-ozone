@@ -1,5 +1,5 @@
 // Ozone Lounge Poster Generator — Prisma Schema
-// TDD v1.0 Stage 02: Database and persistence foundation
+// TDD v1.0 Stage 02/03: Database and Better Auth persistence
 
 datasource db {
   provider  = "postgresql"
@@ -12,53 +12,54 @@ generator client {
 }
 
 // ----------------------------------------------------
-// Authentication & Identity Models (Better Auth Ready)
+// Authentication & Identity Models (Better Auth v1.7.x)
 // ----------------------------------------------------
 
 model User {
-  id            String        @id @default(cuid())
-  name          String?
-  username      String        @unique
-  email         String?       @unique
-  emailVerified Boolean       @default(false)
-  image         String?
-  role          String        @default("operator") // "operator" | "admin"
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              String        @id @default(cuid())
+  name            String
+  email           String        @unique
+  emailVerified   Boolean       @default(false)
+  image           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  username        String?       @unique
+  displayUsername String?
+  role            String        @default("operator") // "operator" | "admin"
 
-  sessions      Session[]
-  accounts      Account[]
-  drafts        PosterDraft[]
-  assets        MediaAsset[]
+  sessions        Session[]
+  accounts        Account[]
+  drafts          PosterDraft[]
+  assets          MediaAsset[]
 
-  @@map("users")
+  @@map("user")
 }
 
 model Session {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token     String   @unique
   expiresAt DateTime
-  ipAddress String?
-  userAgent String?
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@map("sessions")
+  @@map("session")
 }
 
 model Account {
   id                    String    @id @default(cuid())
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accountId             String
   providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
-  accessTokenExpiresAt DateTime?
+  accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String?
@@ -66,7 +67,7 @@ model Account {
   updatedAt             DateTime  @updatedAt
 
   @@index([userId])
-  @@map("accounts")
+  @@map("account")
 }
 
 model Verification {
@@ -77,7 +78,8 @@ model Verification {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@map("verifications")
+  @@index([identifier])
+  @@map("verification")
 }
 
 // ----------------------------------------------------

@@ -83,41 +83,18 @@ const WEEKLY_TEMPLATES = [
 ];
 
 async function main() {
-  console.log("Seeding database with source-backed defaults...");
+  console.log("Seeding database drafts for operator...");
 
-  // 1. Seed or update default operator user
-  const operator = await prisma.user.upsert({
+  const operator = await prisma.user.findUnique({
     where: { username: "ozone_operator" },
-    update: {
-      name: "Ozone Lounge Operator",
-      role: "operator",
-    },
-    create: {
-      username: "ozone_operator",
-      name: "Ozone Lounge Operator",
-      email: "operator@ozonelounge.internal",
-      role: "operator",
-    },
   });
 
-  // 2. Seed or update default admin user
-  await prisma.user.upsert({
-    where: { username: "ozone_admin" },
-    update: {
-      name: "Ozone Lounge Administrator",
-      role: "admin",
-    },
-    create: {
-      username: "ozone_admin",
-      name: "Ozone Lounge Administrator",
-      email: "admin@ozonelounge.internal",
-      role: "admin",
-    },
-  });
+  if (!operator) {
+    console.log("Note: ozone_operator not yet provisioned. Run 'npm run auth:provision' first.");
+    return;
+  }
 
-  console.log(`Verified default users: ${operator.username}`);
-
-  // 3. Seed canonical baseline draft recipes for the seven weekly templates
+  // Seed canonical baseline draft recipes for the seven weekly templates
   for (const tpl of WEEKLY_TEMPLATES) {
     const existingDraft = await prisma.posterDraft.findFirst({
       where: {
@@ -192,7 +169,7 @@ async function main() {
   }
 
   const count = await prisma.posterDraft.count();
-  console.log(`Database seeding completed successfully. Total drafts: ${count}`);
+  console.log(`Draft seeding completed. Total drafts in DB: ${count}`);
 }
 
 main()
