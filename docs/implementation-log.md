@@ -89,16 +89,59 @@ Scaffolded Next.js 15 App Router project with React 19, strict TypeScript, Tailw
 | **App starts locally and renders the minimal route** | **PASS** | Verified HTTP 200 on `/` and `/api/health` returning expected payload. |
 | **No secret values are committed or exposed to client bundles** | **PASS** | Checked git diff; `.env.example` has placeholders only; `.gitignore` protects `.env*`. |
 
+---
+
+## Stage 02: Database and Persistence Foundation
+
+* **Date:** 18 October 2026
+* **Status:** Complete (Gate G2 Pre-requisite Met)
+* **Git Commit / Branch:** Pending Stage 02 commit (master)
+
+### 1. Summary of Changes
+Integrated Prisma ORM pinned to stable `6.19.3` with PostgreSQL. Configured `prisma/schema.prisma` mapping `User`, `Session`, `Account`, `Verification` (Better Auth ready), `PosterDraft` (storing JSON `PosterDocument`), and `MediaAsset`. Connected to Supabase PostgreSQL using connection pooler mode for runtime and session pooler mode (`aws-0-eu-west-1.pooler.supabase.com:5432`) for IPv4 migration reachability. Applied schema push to create all tables in the Supabase public schema. Authored `src/lib/db.ts` with client-side import guard and Next.js HMR connection pooling protection. Implemented `prisma/seed.ts` seeding default operator and admin users plus all 7 canonical weekly template poster drafts matching the brief. Verified complete Create, Read, Update, Delete lifecycle via `scripts/test-db.ts`.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `prisma/schema.prisma`: Database models for identity (`User`, `Session`, `Account`, `Verification`), drafts (`PosterDraft`), and assets (`MediaAsset`).
+  * `prisma/seed.ts`: Idempotent seeding script with source-backed weekly event defaults.
+  * `src/lib/db.ts`: Server-only Prisma client singleton.
+  * `scripts/test-db.ts`: Automated database CRUD verification test.
+  * `.env`: Local configuration with Supabase connection strings (protected by `.gitignore`).
+* **Changed**:
+  * `package.json`: Added `@prisma/client@6.19.3`, `prisma@6.19.3`, `tsx@4.23.15`, and database scripts (`db:generate`, `db:migrate`, `db:push`, `db:seed`).
+  * `package-lock.json`: Locked Prisma dependencies.
+  * `docs/implementation-log.md`: Appended Stage 02 audit section.
+* **Deleted**:
+  * `src/lib/db-test.ts`: Relocated to `scripts/test-db.ts` to keep `src/` clean.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npx prisma validate`: Output `The schema at prisma\schema.prisma is valid 🚀` (PASS).
+* `cmd /c npx prisma generate`: Generated Prisma Client v6.19.3 (PASS).
+* `cmd /c npx prisma db push`: Synchronized schema with Supabase database in 11.39s (PASS).
+* `cmd /c npx tsx prisma/seed.ts`: Seeded `ozone_operator`, `ozone_admin`, and 7 canonical poster drafts (PASS).
+* `cmd /c npx tsx scripts/test-db.ts`: All CRUD steps against Supabase passed (PASS).
+* `cmd /c npx tsc --noEmit`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Production build succeeded in 5.2s (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Migration applies on a clean development database and schema status is correct** | **PASS** | `prisma db push` applied all 6 tables cleanly to Supabase PostgreSQL. |
+| **Database code is never imported into browser-only modules** | **PASS** | `src/lib/db.ts` includes explicit client-side import guard. |
+| **Queries anticipate owner/workspace boundaries and are not globally readable by default** | **PASS** | `PosterDraft` and `MediaAsset` models include explicit `userId` foreign key relation and indices. |
+| **Seed can be re-run safely or clearly documents a one-time behavior** | **PASS** | `prisma/seed.ts` uses `upsert` and unique checks; tested idempotently. |
+
 ### 5. Known Defects, Security Concerns, Performance Concerns & Decisions
-* **Port Conflict**: Default port 3000 had an existing process; runtime test successfully bound to port 3005.
-* **Security**: No secrets committed or exposed.
-* **Performance**: First Load JS shared is 103 kB; homepage bundle is 127 B.
+* **Direct IPv6 Reachability**: Direct connection to `db.[ref].supabase.co:5432` timed out due to local IPv4 network; resolved cleanly by using Supabase pooler session mode on port 5432 for DDL operations.
+* **Security**: Credentials remain strictly inside local `.env` (ignored by Git); no secrets committed.
+* **Performance**: Singleton client prevents connection leaks during Next.js server actions.
 
 ### 6. Confirmation of Boundary
-* Implemented ONLY project bootstrap.
-* NO database models, Prisma schemas, or migrations run (deferred to Stage 02).
-* NO authentication logic or user forms built (deferred to Stage 03).
-* NO poster canvas, templates, or editor controls built (deferred to Stages 05–09).
+* Implemented ONLY persistence foundation.
+* NO login UI, editor UI, or poster rendering implemented yet.
+* Preserved working bootstrap baseline.
 
 ### 7. Recommended Next Stage
-**Stage 02 — Database and persistence foundation** (Prisma ORM setup, PostgreSQL schema for User/Session, PosterDraft, and MediaAsset, migrations, and seed scripts).
+**Stage 03 — Username/password authentication and protected access** (Better Auth integration, session management, username sign-in route, protected route guard).

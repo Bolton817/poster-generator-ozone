@@ -1,0 +1,127 @@
+// Ozone Lounge Poster Generator — Prisma Schema
+// TDD v1.0 Stage 02: Database and persistence foundation
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ----------------------------------------------------
+// Authentication & Identity Models (Better Auth Ready)
+// ----------------------------------------------------
+
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  username      String        @unique
+  email         String?       @unique
+  emailVerified Boolean       @default(false)
+  image         String?
+  role          String        @default("operator") // "operator" | "admin"
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  drafts        PosterDraft[]
+  assets        MediaAsset[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+// ----------------------------------------------------
+// Poster Draft & Canvas Persistence
+// ----------------------------------------------------
+
+model PosterDraft {
+  id              String   @id @default(cuid())
+  name            String
+  templateId      String   // "reddington" | "saint" | "lannister" | "shelby" | "lothbrok" | "escobar" | "pinkman"
+  templateVersion Int      @default(1)
+  schemaVersion   Int      @default(1)
+  document        Json     // Serialized canonical PosterDocument state
+  thumbnailUrl    String?
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([templateId])
+  @@index([updatedAt])
+  @@map("poster_drafts")
+}
+
+// ----------------------------------------------------
+// Media Asset Metadata
+// ----------------------------------------------------
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  storageKey String   @unique // Durable key in storage bucket or local uploads
+  publicUrl  String   // Browser-accessible URL (permanent, never temporary blob:)
+  fileName   String   // Original user upload filename
+  mimeType   String   // image/jpeg, image/png, image/webp
+  fileSize   Int      // Byte count
+  width      Int?     // Decoded image pixel width
+  height     Int?     // Decoded image pixel height
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@index([storageKey])
+  @@map("media_assets")
+}
