@@ -175,13 +175,23 @@ Implemented production-grade authentication with Better Auth (v1.7.11) using the
 * `Invoke-WebRequest http://localhost:3005/login`: Returned HTTP 200 (PASS).
 * `curl -I http://localhost:3005/app/templates`: Returned HTTP 307 Redirect to `/login?callbackUrl=%2Fapp%2Ftemplates` (PASS).
 
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Anonymous requests cannot read drafts, upload media or invoke poster services** | **PASS** | `src/middleware.ts` intercepts `/app/*` and redirects to `/login`. |
+| **Correct credentials create a session; wrong credentials do not** | **PASS** | Verified in `scripts/test-auth.ts` test 1, 2, and 3. |
+| **Session survives normal navigation and can be invalidated on logout** | **PASS** | Verified session in PostgreSQL and successful invalidation in test 4 & 6. |
+| **The public UI has no create-account path** | **PASS** | `LoginForm.tsx` provides username and password inputs only; no sign-up link. |
+| **Secrets and password hashes never appear in client payloads or logs** | **PASS** | Hashed credentials stay in PostgreSQL; client receives session token only. |
+
 ---
 
 ## Stage 04: Responsive App Shell and Interface Themes
 
 * **Date:** 18 October 2026
 * **Status:** Complete (Gate G2 Passed)
-* **Git Commit / Branch:** Pending Stage 04 commit (master)
+* **Git Commit / Branch:** `3297ad0` (master)
 
 ### 1. Summary of Changes
 Designed and built the mobile-first, responsive application shell and theme framework. Created `src/features/theme/theme-context.tsx` with Dark mode default, bright mode toggle, and `localStorage` persistence (`ozone_theme_preference`). Built reusable accessible UI primitives in `src/components/ui/` (`Button`, `Input`, `Textarea`, `Select`, `CollapsibleSection`, `Dialog`, `Toast`). Built responsive header (`src/components/app-shell/AppHeader.tsx`) with brand mark, active title, theme switcher, and user profile dropdown with one-click logout. Built dual-mode navigation (`src/components/app-shell/AppNavigation.tsx`) with mobile sticky bottom bar (safe-area aware) and desktop sub-nav tabs. Implemented protected layout (`src/app/app/layout.tsx`) and workspace routes (`/app/templates`, `/app/drafts`, `/app/settings`). Validated all routes via `scripts/test-shell.ts`.
@@ -223,10 +233,49 @@ Designed and built the mobile-first, responsive application shell and theme fram
 | **No horizontal overflow at common phone widths** | **PASS** | Viewport layout verified with responsive flex/grid and mobile safe-area padding. |
 | **Focus state, labels and basic keyboard navigation work** | **PASS** | ARIA attributes, focus rings, and Escape key listeners implemented on interactive primitives. |
 
+---
+
+## Stage 05: Typed Poster Document Contract and Template Registry
+
+* **Date:** 18 October 2026
+* **Status:** Complete (Gate G2 Passed)
+* **Git Commit / Branch:** Pending Stage 05 commit (master)
+
+### 1. Summary of Changes
+Defined the canonical, serializable TypeScript contract and Zod runtime schema (`src/features/poster/schema.ts`) for `PosterDocument` (`schemaVersion: 1`, `templateVersion: 1`, fixed canvas `1080×1350`, event content, asset IDs, styling tokens, and normalized focal points). Established the single-source-of-truth Template Registry (`src/features/templates/registry.ts`) registering all 7 weekly templates in exact Monday-to-Sunday order (`reddington`, `saint`, `lannister`, `shelby`, `lothbrok`, `escobar`, `pinkman`) with verbatim event copy, lineups, source offers, curated palette presets, and default document factories. Preserved Friday's empty offer as valid empty string (zero placeholder text). Refactored template gallery overview (`src/app/app/templates/page.tsx`) to consume the registry directly. Developed and executed automated regression test suite (`scripts/test-registry.ts`) asserting 100% contract compliance, input rejection, and template extensibility.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `src/features/poster/schema.ts`: Zod schemas and inferred types for `TemplateId`, `CanvasConfig`, `PosterContent`, `PosterAssets`, `FocalPoint`, `PosterStyling`, and `PosterDocument`.
+  * `src/features/templates/registry.ts`: Authoritative registry for 7 weekly templates, query functions (`getTemplatesInOrder`, `getTemplateById`, `createDefaultPosterDocument`, `validatePosterDocument`).
+  * `scripts/test-registry.ts`: Automated regression test suite.
+* **Changed**:
+  * `package.json` & `package-lock.json`: Added `zod`.
+  * `src/app/app/templates/page.tsx`: Rewired template gallery to read from `getTemplatesInOrder()`.
+  * `docs/implementation-log.md`: Appended Stage 05 report.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npm install zod`: Verified installed/up to date (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: All 5 test suites passed (weekday order, source copy verbatim match, default documents validation, input rejection, extensibility) (PASS).
+* `cmd /c npx tsc --noEmit`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Production build compiled 9 routes cleanly in 13.4s (PASS).
+* `cmd /c npx tsx scripts/test-shell.ts`: Verified `/app/templates` rendered registry data (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **All seven entries exist exactly once and appear in weekday order** | **PASS** | Verified in `scripts/test-registry.ts` Test 1 (Monday to Sunday order). |
+| **Registry can support an eighth template without editing multiple hard-coded switch statements** | **PASS** | Verified in `scripts/test-registry.ts` Test 5 with mock 8th template. |
+| **Unknown details remain blank and conditional** | **PASS** | Date, start time, location left blank; Friday offer is explicitly empty string. |
+| **Runtime validation rejects invalid template IDs and malformed content** | **PASS** | Verified in `scripts/test-registry.ts` Test 4 (rejected invalid ID, bad canvas size, bad focal points, empty title). |
+
 ### 5. Confirmation of Boundary
-* Implemented ONLY responsive shell, theme system, and UI primitives.
-* NO poster canvas, template renderer components, or export logic built yet (scheduled for Stages 05–09).
-* Preserved working auth, database, and bootstrap foundations.
+* Implemented ONLY typed document contracts, schemas, and template registry.
+* NO visual canvas renderers or editor controls built yet (scheduled for Stages 06–09).
+* Preserved working auth, database, shell, and theme foundations.
 
 ### 6. Recommended Next Stage
-**Stage 05 — Typed poster document contract and template registry** (canonical TypeScript types, Zod runtime schema validators, and single-source registry for the 7 templates).
+**Stage 06 — Premium fonts and image asset infrastructure** (TTF/OTF font registry, font loading/readiness detection, and durable asset storage/upload adapter).
