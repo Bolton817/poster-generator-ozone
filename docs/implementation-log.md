@@ -423,4 +423,86 @@ Established font registration and durable image storage infrastructure in strict
 ### 6. Recommended Next Stage
 **Stage 08 — Shared editor state and mobile control framework** (single poster document state with typed actions, mobile-first editor sections for Event Details, Lineup, Offer, Artwork, Typography, Colours, and Publishing Details, with dirty-state tracking).
 
+---
+
+## Stage 08: Shared Editor State and Mobile Control Framework
+
+* **Date:** 20 October 2026
+* **Status:** Complete (Gate G3/G4 Readiness Met)
+* **Git Commit / Branch:** HEAD (master)
+
+### 1. Summary of Changes
+1. **Canonical Editor Reducer & Context Architecture ([`src/features/editor/`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/editor))**:
+   - Built `editorReducer` (`editor-reducer.ts`) and `EditorProvider` (`editor-context.tsx`) managing all `PosterDocument` state updates immutably.
+   - Enforced strict architectural boundary separating transient UI state (`activeSection`, `activeField`, theme, preview zoom) from the saved poster document; transient UI state never mutates or dirties `PosterDocument`.
+   - Real-time dirty-state detection compares current state against `initialDocument`. Attached browser `beforeunload` listener when dirty.
+2. **Non-blocking Validation & Text Guidance ([`src/features/editor/validation.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/editor/validation.ts))**:
+   - Implemented real-time length warnings for titles (> 45 chars), lineup names (> 28 chars), and offers (> 60 chars) so operators are guided without silent copy truncation.
+   - Added Friday Flight Fridays empty-offer informational banner (Decision 06) and normalized focal point boundary checks (0..1).
+3. **Mobile-First Collapsible Control Sections ([`src/components/editor/sections/`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections))**:
+   - `EventDetailsSection`: Day label badge, title input with live character counter and warning badges, draft name input.
+   - `LineupSection`: Separates DJs and Hosts into distinct semantic role groups with dynamic add, update, and touch-friendly removal.
+   - `OfferSection`: Primary and secondary offer inputs with character counters and Friday empty offer guidance.
+   - `ArtworkSection`: Hero background and logo uploaders with instant preview, removal, and interactive 2D focal point range sliders (0..1).
+   - `TypographySection`: Curated font pairings filtered strictly by the active template's registry definitions.
+   - `ColoursSection`: Visual color swatches (primary, secondary, accent, background) for the template's curated palettes.
+   - `PublishingSection`: Date, time, venue, location, contact, and social handle inputs with clean-omission preflight guidance.
+4. **Editor Shell & Template Routing**:
+   - `EditorSectionList.tsx`: Accordion container rendering all sections.
+   - `PosterEditor.tsx`: Responsive workspace layout with mobile tab switching (`Controls` vs `Preview`), desktop split-screen with live `CanvasViewport` preview reflecting title/lineup/color changes in real-time, and accessible confirmation dialogs for reset and dirty navigation.
+   - `src/app/app/templates/[templateId]/page.tsx`: Dynamic route with `generateStaticParams` covering all 7 templates.
+   - `src/app/app/templates/page.tsx`: Wrapped all gallery cards with links to `/app/templates/[templateId]`.
+5. **Automated Verification Suite ([`scripts/test-editor-framework.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/scripts/test-editor-framework.ts))**:
+   - 31 automated tests verifying reducer immutability, lineup role separation, transient state isolation, dirty-state lifecycle, non-blocking text guidance, and JSON schema serialization invariance.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * [`src/features/editor/types.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/editor/types.ts): Typed actions, state, and warning schemas.
+  * [`src/features/editor/validation.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/editor/validation.ts): Character-length guidance and focal point validators.
+  * [`src/features/editor/editor-reducer.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/editor/editor-reducer.ts): Pure immutable editor reducer.
+  * [`src/features/editor/editor-context.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/editor/editor-context.tsx): React context provider with navigation guard.
+  * [`src/components/editor/EditorSectionList.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/EditorSectionList.tsx): Accordion sections list container.
+  * [`src/components/editor/PosterEditor.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/PosterEditor.tsx): Responsive editor shell with live canvas preview and dialogs.
+  * [`src/components/editor/sections/EventDetailsSection.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections/EventDetailsSection.tsx): Event title & draft naming section.
+  * [`src/components/editor/sections/LineupSection.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections/LineupSection.tsx): DJ and Host lineup section.
+  * [`src/components/editor/sections/OfferSection.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections/OfferSection.tsx): Promotions and Friday offer section.
+  * [`src/components/editor/sections/ArtworkSection.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections/ArtworkSection.tsx): Artwork slots and focal point section.
+  * [`src/components/editor/sections/TypographySection.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections/TypographySection.tsx): Curated font presets section.
+  * [`src/components/editor/sections/ColoursSection.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections/ColoursSection.tsx): Curated color palettes section.
+  * [`src/components/editor/sections/PublishingSection.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/editor/sections/PublishingSection.tsx): Publishing logistics section.
+  * [`src/app/app/templates/[templateId]/page.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/app/app/templates/%5BtemplateId%5D/page.tsx): Template editor page route.
+  * [`scripts/test-editor-framework.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/scripts/test-editor-framework.ts): 31-test automated CLI test suite.
+* **Changed**:
+  * [`src/app/app/templates/page.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/app/app/templates/page.tsx): Wrapped template cards with links to `/app/templates/[templateId]`.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npx tsx scripts/test-editor-framework.ts`: 31/31 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-canvas-export.ts`: 19/19 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-fonts-and-assets.ts`: 5/5 regression suites passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 registry tests passed (PASS).
+* `cmd /c npm run type-check`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: 18 routes compiled cleanly in 10.0s (all 7 template SSG paths rendered) (PASS).
+* `node -e "fetch('http://localhost:3005/app/templates/reddington')..."`: Returned HTTP 200 OK (PASS).
+* `node -e "fetch('http://localhost:3005/app/templates/lothbrok')..."`: Returned HTTP 200 OK (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Editing controls update live document state predictably** | **PASS** | Verified in `scripts/test-editor-framework.ts` Suite 1 across all action types. Desktop split-screen renders live canvas updates on title, lineup, and palette changes. |
+| **Transient app theme and preview zoom never dirty or modify saved poster state** | **PASS** | Verified in Suite 2. `SET_ACTIVE_SECTION` and `SET_ACTIVE_FIELD` do not alter document content or set `isDirty = true`. |
+| **Changing template-specific options cannot create invalid document objects** | **PASS** | Verified in Suite 5. Modified documents strictly validate against `PosterDocumentSchema.safeParse`. |
+| **Long text provides a warning/reflow strategy rather than silently disappearing** | **PASS** | Verified in Suite 4. Warnings generated for long title (>45 chars), long lineup names (>28 chars), and long offers (>60 chars) without truncation. |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY shared editor state, reducer, mobile-first control sections, and template editor shell.
+* Did NOT design template-specific visual compositions or database save actions (scheduled for Stage 09 Reddington and Stage 11 Drafts).
+* Preserved working auth, database, shell, registry, fonts, and canvas export POC foundations.
+
+### 6. Recommended Next Stage
+**Stage 09 — Reddington end-to-end vertical slice** (complete Monday Reddington retro/sunset template composition, live preview rendering, export fixture, and end-to-end workflow).
+
+
 

@@ -39,9 +39,10 @@ export default function TemplatesPage() {
       {/* Grid of Templates directly from Registry */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {templates.map((tpl) => (
-          <div
+          <Link
             key={tpl.id}
-            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-slate-800 bg-slate-900/80 hover:border-slate-700 transition-all shadow-lg overflow-hidden"
+            href={`/app/templates/${tpl.id}`}
+            className="group relative flex flex-col justify-between p-5 rounded-2xl border border-slate-800 bg-slate-900/80 hover:border-slate-700 hover:border-amber-500/40 transition-all shadow-lg overflow-hidden cursor-pointer"
           >
             <div className="relative z-10 space-y-3">
               <div className="flex items-center justify-between">
@@ -85,11 +86,11 @@ export default function TemplatesPage() {
                 1080 × 1350 px (4:5)
               </span>
               <span className="text-amber-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 text-xs font-semibold">
-                <span>Select</span>
+                <span>Customize</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
