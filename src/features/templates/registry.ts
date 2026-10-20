@@ -475,6 +475,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     tag: "Best for Premium Fridays",
     description: "Premium nightlife, energetic DJ visuals and a high-energy Friday atmosphere.",
     templateVersion: 1,
+    thumbnailUrl: "/template-thumbnails/lothbrok.svg",
     palettePresets: [
       {
         id: "black-chrome",
@@ -508,9 +509,16 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
       {
         id: "premium-sharp",
         name: "Striking Premium Display",
-        displayFont: "sans-serif",
-        bodyFont: "sans-serif",
-        labelFont: "sans-serif",
+        displayFont: "Bebas Neue",
+        bodyFont: "Inter",
+        labelFont: "Inter",
+      },
+      {
+        id: "nightlife-condensed",
+        name: "Nightlife Condensed & Sharp",
+        displayFont: "Source Sans 3",
+        bodyFont: "Inter",
+        labelFont: "Bebas Neue",
       },
     ],
     layoutOptions: [
@@ -544,7 +552,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
         paletteId: "black-chrome",
         typographyPresetId: "premium-sharp",
         layoutOptionId: "hero-focus-no-offer",
-        decorationOptions: { metallicAccents: true },
+        decorationOptions: { metallicAccents: true, speedLines: true, frameAngle: 12 },
         focalPoints: { background: { x: 0.5, y: 0.5 } },
       },
     },

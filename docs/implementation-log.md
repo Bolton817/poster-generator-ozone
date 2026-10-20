@@ -1030,6 +1030,75 @@ Capture theatrical karaoke-night energy, evoking looking toward a lit stage with
 ### 6. Recommended Next Stage
 **Stage 16 — Lothbrok Template (Friday Flight Fridays / Premium Nightlife / Offer-Free Rebalancing)**: Implement the Friday Flight Fridays template renderer, sleek motion/diagonal framing, premium nightlife aesthetic, and mandatory offer-free layout rebalancing (zero empty card or placeholder text per Decision 06).
 
+---
+
+## 2026-10-20 — Stage 16: Lothbrok Template (Friday Flight Fridays / Premium Nightlife / Offer-Free Rebalancing)
+
+### 1. Goal
+Implement the fifth dedicated daily composition renderer: **Lothbrok** for **Friday Flight Fridays**, strictly following Blueprint Section 4.6, Decision 06 in `docs/decision-register.md`, and TDD specifications (pages 88–89).
+
+Deliver premium, fast-moving Friday nightlife energy: high contrast, confident typography, metallic chrome accents, aerodynamic speed-line cuts, a prominent headline line-up (**DJ Slim D & Mistabrand**), and **mandatory offer-free layout rebalancing** (no offer card rendered by default; zero awkward empty spaces; zero invented placeholder text like *"No special offer provided yet"*).
+
+### 2. Implementation Summary
+* **Lothbrok Vector Thumbnail** (`public/template-thumbnails/lothbrok.svg`): Created 400 × 500 px vector thumbnail with deep onyx night base (`#020617`), metallic chrome diagonal speed cuts, aerodynamic flight streaks, "FLIGHT FRIDAYS" bold headline, prominent lineup teaser ("DJ SLIM D & MISTABRAND"), "PREMIUM FRIDAY NIGHTLIFE" tag, and zero dummy offer box (strictly honoring Decision 06).
+* **Template Registry Refinements** (`src/features/templates/registry.ts`):
+  * Attached `thumbnailUrl: "/template-thumbnails/lothbrok.svg"`.
+  * Refined typography pairing presets: `premium-sharp` (`Bebas Neue` display + `Inter` body/labels) and `nightlife-condensed` (`Source Sans 3` display + `Inter` body + `Bebas Neue` labels).
+  * Configured default decoration tokens: `{ metallicAccents: true, speedLines: true, frameAngle: 12 }`.
+* **Lothbrok Template Component** (`src/components/poster/templates/LothbrokTemplate.tsx`):
+  * Master dimensions: unscaled 1080 × 1350 px canvas (`data-testid="lothbrok-template-root"`).
+  * Layer 1: Ambient metallic glow, aerodynamic speed lines across canvas, 12-degree angled slice geometry (`diagonal-split`) or balanced center beam (`hero-focus-no-offer`), and polished double metallic perimeter frames with corner brackets.
+  * Layer 2: Hero Friday nightlife/DJ background image slot (`assets.backgroundAssetId`) with focal point positioning (`focalPoints.background`), luminosity blend, and metallic dark vignette overlay.
+  * Layer 3: Top header branding ("OZONE LOUNGE"), "FRIDAY FLIGHT NIGHTLIFE" subtag, animated "WEEKEND TAKEOFF" badge, and optional date/time tags.
+  * Layer 4: Aerodynamic flight wing emblem, oversized "FLIGHT FRIDAYS" headline with chrome/silver/ice-blue metallic gradient, and speed-blur text shadow.
+  * Layer 5: **Prominent Headliner Lineup Showcase**: High-impact DJ panel featuring **DJ Slim D & Mistabrand** with metallic badges, audio EQ bars, and urban sound policy copy.
+  * Layer 6: **Decision 06 Offer-Free Architecture**:
+    * When offers are blank (default per brief): Zero elements rendered. Space dynamically reallocates to headline and DJ lineup. Zero placeholder text.
+    * When an operator inputs a promotion: Renders a sleek metallic discount ribbon.
+  * Layer 7: Footer with Ozone Lounge branding, operational logistics (smart casual dress code), and `@ozonelounge` social handle.
+* **Renderer Resolver Integration** (`src/features/templates/renderers.tsx`):
+  * Mapped `lothbrok: LothbrokTemplate` in `TEMPLATE_RENDERERS`.
+* **Comprehensive Test Suite** (`scripts/test-lothbrok-template.ts`):
+  * 37/37 automated tests passing across 8 test suites.
+* **Regression & Build Verification**:
+  * All regression test suites passed (Shelby 40/40, Lannister 39/39, Saint 30/30, Batch Export 33/33, Draft Persistence 16/16, Reddington 20/20, Registry 5/5).
+  * Next.js production build (`npm run build`) succeeded in 9.7s with 19 static/dynamic routes.
+  * Live HTTP smoke tests verified on port 3005.
+
+### 3. Verification Commands & Results
+* `cmd /c npx tsx scripts/test-lothbrok-template.ts`: 37/37 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-shelby-template.ts`: 40/40 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-lannister-template.ts`: 39/39 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-saint-template.ts`: 30/30 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-batch-export.ts`: 33/33 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-draft-persistence.ts`: 16/16 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-reddington-vertical-slice.ts`: 20/20 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 tests passed (PASS).
+* `cmd /c npm run build`: Compiled 19 routes cleanly in 9.7s (PASS).
+* `Live smoke test (port 3005)`: Health (200), Lothbrok thumbnail (200), Auth login (200), Templates gallery (200), Lothbrok editor route (200) (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Lothbrok template renderer implemented (Blueprint 4.6)** | **PASS** | `LothbrokTemplate.tsx` mounts 1080×1350 px unscaled master canvas with sleek aerodynamic Friday nightlife aesthetic. |
+| **Decision 06 Offer-Free Architecture enforced** | **PASS** | Zero offer containers and zero placeholder text rendered when offers are blank, verified in `test-lothbrok-template.ts` Suite 5 & 6 and live smoke test. |
+| **Prominent DJ lineup showcase** | **PASS** | Resident selectors DJ Slim D & Mistabrand given primary visual prominence with high-impact metallic styling. |
+| **Three curated palette presets verified** | **PASS** | Black & Chrome, Ice Blue, and Aubergine Luxe verified in Suite 2. |
+| **Two layout options (hero-focus-no-offer vs diagonal-split)** | **PASS** | Both layout modes supported with configurable metallic speed lines in Suite 4. |
+| **Verbatim copy & artist lineup integrity** | **PASS** | "Flight Fridays" and DJ lineup verified in Suite 5. |
+| **Conditional layout rebalancing** | **PASS** | Verified in Suite 6: blank offers, custom populated offers, custom lineups, or blank logistics rebalance cleanly without breaking composition. |
+| **Dedicated vector thumbnail in template gallery** | **PASS** | `lothbrok.svg` created, linked in registry, and verified in gallery (/app/templates). |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Lothbrok Template (Friday Flight Fridays / Premium Nightlife / Offer-Free Rebalancing).
+* Did NOT implement templates 6–7 (Escobar, Pinkman); reserved for Stages 17–18.
+* Preserved working auth, database, app shell, font, editor, and export foundations.
+
+### 6. Recommended Next Stage
+**Stage 17 — Escobar Template (Saturday Fiesta / Weekend Celebration / Layered Colour Blocks)**: Implement the Saturday Fiesta template renderer, celebratory layered colour blocks, energetic weekend lighting, and beverage special handling (Discounts on whiskey bottles and cognac).
+
+
 
 
 
