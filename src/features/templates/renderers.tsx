@@ -14,6 +14,7 @@ import { SaintTemplate } from "@/components/poster/templates/SaintTemplate";
 import { LannisterTemplate } from "@/components/poster/templates/LannisterTemplate";
 import { ShelbyTemplate } from "@/components/poster/templates/ShelbyTemplate";
 import { LothbrokTemplate } from "@/components/poster/templates/LothbrokTemplate";
+import { EscobarTemplate } from "@/components/poster/templates/EscobarTemplate";
 
 export type TemplateRendererComponent = React.ComponentType<{
   document: PosterDocument;
@@ -46,7 +47,7 @@ const TEMPLATE_RENDERERS: Record<TemplateId, TemplateRendererComponent> = {
   lannister: LannisterTemplate,
   shelby: ShelbyTemplate,
   lothbrok: LothbrokTemplate,
-  escobar: PlaceholderTemplateRenderer,
+  escobar: EscobarTemplate,
   pinkman: PlaceholderTemplateRenderer,
 };
 

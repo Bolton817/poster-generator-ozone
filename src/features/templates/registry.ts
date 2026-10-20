@@ -567,6 +567,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     tag: "Best for Saturday Fiesta",
     description: "Fiesta energy, colourful lights and a vibrant weekend celebration.",
     templateVersion: 1,
+    thumbnailUrl: "/template-thumbnails/escobar.svg",
     palettePresets: [
       {
         id: "fiesta-citrus",
@@ -599,17 +600,24 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     typographyPresets: [
       {
         id: "celebration-heavy",
-        name: "Festive Rounded & Condensed",
-        displayFont: "sans-serif",
-        bodyFont: "sans-serif",
-        labelFont: "sans-serif",
+        name: "Festive Heavy & Impact",
+        displayFont: "Bebas Neue",
+        bodyFont: "Inter",
+        labelFont: "Source Sans 3",
+      },
+      {
+        id: "fiesta-vibrant",
+        name: "Fiesta Vibrant Sans",
+        displayFont: "Source Sans 3",
+        bodyFont: "Inter",
+        labelFont: "Bebas Neue",
       },
     ],
     layoutOptions: [
       { id: "color-blocks", name: "Layered Color Blocks" },
-      { id: "fiesta-burst", name: "Fiesta Burst" },
+      { id: "fiesta-glow", name: "Fiesta Glow & Orbs" },
     ],
-    supportedImageSlots: ["background", "texture"],
+    supportedImageSlots: ["background"],
     defaults: {
       schemaVersion: 1,
       templateId: "escobar",
@@ -636,7 +644,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
         paletteId: "fiesta-citrus",
         typographyPresetId: "celebration-heavy",
         layoutOptionId: "color-blocks",
-        decorationOptions: { lightOrbs: true },
+        decorationOptions: { lightOrbs: true, confettiAccents: true, cardElevation: true },
         focalPoints: { background: { x: 0.5, y: 0.5 } },
       },
     },

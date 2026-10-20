@@ -1096,7 +1096,69 @@ Deliver premium, fast-moving Friday nightlife energy: high contrast, confident t
 * Preserved working auth, database, app shell, font, editor, and export foundations.
 
 ### 6. Recommended Next Stage
-**Stage 17 — Escobar Template (Saturday Fiesta / Weekend Celebration / Layered Colour Blocks)**: Implement the Saturday Fiesta template renderer, celebratory layered colour blocks, energetic weekend lighting, and beverage special handling (Discounts on whiskey bottles and cognac).
+**Stage 17 — Escobar Template (Saturday Fiesta / Weekend Celebration / Layered Colour Blocks)**: Completed below.
+
+---
+
+## Stage 17: Escobar Template (Saturday Fiesta / Weekend Celebration / Layered Colour Blocks)
+
+**Status:** COMPLETE  
+**Date:** 2026-10-20  
+**TDD Reference:** Stage 17, Pages 89–90  
+**Blueprint Reference:** Section 4.7 (Escobar — Saturday Fiesta)  
+
+### 1. Goal
+Implement the sixth dedicated daily template, **Escobar (Saturday Fiesta)**, bringing a high-energy celebratory weekend visual aesthetic governed by Blueprint Section 4.7. Features layered colour blocks, radiant fiesta ambient light orbs, prominent resident performer billing (**DVJ Jojez**), beverage special handling (**"Discounts on whiskey bottles and cognac."**), dedicated vector thumbnail, and 100% automated test verification.
+
+### 2. Architecture & Design Decisions
+1. **Master Coordinate & Canvas System**:
+   - Master 1080 × 1350 px unscaled canvas (`data-testid="escobar-template-root"`).
+   - Strict 4:5 aspect ratio preserving high-resolution print and digital social export fidelity.
+2. **Layered Colour Blocks & Radiant Light Atmosphere**:
+   - `Layered Color Blocks` layout: architectural angled fiesta color blocks (`#f59e0b`, `#ef4444`, `#10b981`), festive ribbons, and geometric tiers.
+   - `Fiesta Glow & Orbs` layout: radiant ambient radial gradient orbs, bokeh lighting, and warm celebratory atmosphere.
+   - Configurable decoration options: `lightOrbs`, `confettiAccents`, `cardElevation`.
+3. **Talent & Performer Billing**:
+   - Resident performer: **DVJ Jojez** prominently featured with a dedicated `DVJ` tag badge and live audio/video equalizer bar indicators.
+4. **Weekend Beverage Special Offer Handling**:
+   - Curated offer card for **"Discounts on whiskey bottles and cognac."** with premium bottle and cognac snifter iconography.
+   - If offers are cleared, the layout gracefully collapses the container without rendering dummy placeholder text ("No special offer provided yet").
+5. **Three Curated Saturday Palettes**:
+   - **Fiesta Citrus**: Warm Amber (`#f59e0b`), Fiery Red (`#ef4444`), Emerald Accent (`#10b981`), Dark Fiesta Charcoal (`#180a04`), Pale Cream (`#fffbeb`).
+   - **Coral Electric**: Neon Coral (`#fb7185`), Electric Crimson (`#f43f5e`), Soft Petal (`#fda4af`), Dark Night Ruby (`#17040a`), Soft Rose (`#fff1f2`).
+   - **Purple & Gold**: Fiesta Gold (`#eab308`), Vivid Royal Purple (`#a855f7`), Bright Gold (`#facc15`), Midnight Plum (`#13041c`), Lavender White (`#fdf4ff`).
+6. **Dedicated Vector Thumbnail**:
+   - `public/template-thumbnails/escobar.svg` (400 × 500 px) with layered color blocks, radiant light orbs, Saturday Fiesta title, DVJ Jojez, and whiskey & cognac special badge.
+
+### 3. Deliverables & Files Changed
+* `public/template-thumbnails/escobar.svg`: Dedicated 400 × 500 px vector thumbnail.
+* `src/features/templates/registry.ts`: Linked thumbnail, refined typography (`celebration-heavy`, `fiesta-vibrant`) and layout presets (`color-blocks`, `fiesta-glow`).
+* `src/components/poster/templates/EscobarTemplate.tsx`: 1080 × 1350 px unscaled canvas composition.
+* `src/features/templates/renderers.tsx`: Mapped `escobar: EscobarTemplate`.
+* `scripts/test-escobar-template.ts`: 55 automated unit and SSR integration tests (55/55 passed).
+* `scratch/smoke-test-escobar.ts`: Live smoke test verified on port 3005.
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Escobar template renderer implemented (Blueprint 4.7)** | **PASS** | `EscobarTemplate.tsx` mounts 1080×1350 px unscaled master canvas with festive layered color blocks and light orbs. |
+| **Talent billing for DVJ Jojez** | **PASS** | Resident performer DVJ Jojez rendered with prominent DVJ badge and audio/visual equalizer indicators. |
+| **Beverage special handling** | **PASS** | "Discounts on whiskey bottles and cognac." rendered with styled bottle/glass card; collapses cleanly if cleared. |
+| **Three curated palette presets verified** | **PASS** | Fiesta Citrus, Coral Electric, and Purple & Gold verified in Suite 2. |
+| **Two layout options (color-blocks vs fiesta-glow)** | **PASS** | Both layout options supported with configurable decorative accents in Suite 3. |
+| **Verbatim copy & artist lineup integrity** | **PASS** | "Saturday Fiesta", "DVJ Jojez", and whiskey/cognac discounts verified in Suite 4. |
+| **Conditional layout rebalancing & schema validity** | **PASS** | Verified in Suite 5 & 8: cleared offers, custom offers, and custom lineups rebalance cleanly. |
+| **Dedicated vector thumbnail in template gallery** | **PASS** | `escobar.svg` created, linked in registry, and verified in gallery (/app/templates). |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Escobar Template (Saturday Fiesta / Weekend Celebration / Layered Colour Blocks).
+* Did NOT implement template 7 (Pinkman); reserved for Stage 18.
+* Preserved working auth, database, app shell, font, editor, and export foundations.
+
+### 6. Recommended Next Stage
+**Stage 18 — Pinkman Template (Sunday Old Skool Sundays / Nostalgic Vinyl / Vintage Beer Bucket)**: Implement the final Sunday template renderer with nostalgic vinyl and cassette motifs, textured retro backdrop, and vintage beer-bucket offer handling (Discounts on beer buckets).
+
 
 
 
