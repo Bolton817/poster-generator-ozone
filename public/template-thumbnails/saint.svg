@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="100%" height="100%">
+  <defs>
+    <!-- Geometric Pattern Tile -->
+    <pattern id="afroChevron" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 0 15 L 15 0 L 30 15 L 15 30 Z" fill="none" stroke="#eab308" stroke-opacity="0.12" stroke-width="1.5" />
+      <path d="M 15 15 L 30 0 M 0 30 L 15 15" stroke="#f59e0b" stroke-opacity="0.08" stroke-width="1" />
+    </pattern>
+
+    <!-- Saffron & Amber Title Gradient -->
+    <linearGradient id="saintGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="40%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+
+    <!-- Asymmetrical Glow -->
+    <linearGradient id="diagonalBeam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eab308" stop-opacity="0.25" />
+      <stop offset="50%" stop-color="#ca8a04" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base: Deep Midnight Slate -->
+  <rect width="400" height="500" fill="#0b1120" />
+
+  <!-- Geometric Rhythm Pattern Overlay -->
+  <rect width="400" height="500" fill="url(#afroChevron)" />
+
+  <!-- Asymmetric Bold Color Blocks & Diagonal Cutouts -->
+  <path d="M 0 0 L 260 0 L 160 500 L 0 500 Z" fill="url(#diagonalBeam)" />
+  <path d="M 400 60 L 280 60 L 330 220 L 400 180 Z" fill="#eab308" fill-opacity="0.08" />
+  <polygon points="360,0 400,0 400,120" fill="#f59e0b" fill-opacity="0.15" />
+
+  <!-- Modern Angular Accent Bars -->
+  <line x1="30" y1="28" x2="370" y2="28" stroke="#eab308" stroke-opacity="0.3" stroke-width="1" />
+  <line x1="30" y1="465" x2="370" y2="465" stroke="#eab308" stroke-opacity="0.3" stroke-width="1" />
+
+  <!-- Header -->
+  <g transform="translate(30, 42)">
+    <rect width="26" height="26" rx="5" fill="#eab308" fill-opacity="0.2" stroke="#eab308" stroke-opacity="0.5" stroke-width="1" />
+    <text x="13" y="17" fill="#eab308" font-family="sans-serif" font-weight="900" font-size="11" text-anchor="middle">OZ</text>
+    
+    <text x="34" y="13" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="11" letter-spacing="1">OZONE LOUNGE</text>
+    <text x="34" y="23" fill="#94a3b8" font-family="sans-serif" font-weight="600" font-size="7.5" letter-spacing="1.5">TUESDAY AFROBEAT NIGHT</text>
+
+    <text x="340" y="18" fill="#eab308" font-family="sans-serif" font-weight="800" font-size="10" text-anchor="end" letter-spacing="1.5">SAINT</text>
+  </g>
+
+  <!-- Tag Pill -->
+  <g transform="translate(200, 100)">
+    <rect x="-65" y="-10" width="130" height="20" rx="4" fill="#eab308" fill-opacity="0.15" stroke="#eab308" stroke-opacity="0.4" />
+    <text x="0" y="3" fill="#facc15" font-family="sans-serif" font-weight="800" font-size="8.5" letter-spacing="2" text-anchor="middle">EVERY TUESDAY NIGHT</text>
+  </g>
+
+  <!-- Title Section: African Night (Afro) -->
+  <text x="200" y="152" fill="url(#saintGold)" font-family="Impact, sans-serif" font-size="38" letter-spacing="2" text-anchor="middle">AFRICAN NIGHT</text>
+
+  <!-- Afro Sub-badge with Geometric Bracket Accents -->
+  <g transform="translate(200, 182)">
+    <rect x="-42" y="-11" width="84" height="22" rx="4" fill="#ca8a04" fill-opacity="0.25" stroke="#eab308" stroke-width="1.5" />
+    <text x="0" y="4" fill="#ffffff" font-family="sans-serif" font-weight="900" font-size="11" letter-spacing="3" text-anchor="middle">AFRO</text>
+    <polyline points="-52,-4 -58,0 -52,4" fill="none" stroke="#eab308" stroke-width="2" />
+    <polyline points="52,-4 58,0 52,4" fill="none" stroke="#eab308" stroke-width="2" />
+  </g>
+
+  <!-- Geometric Frame Anchor (Middle Illustration) -->
+  <g transform="translate(200, 260)">
+    <!-- Offset Diamond Frame -->
+    <rect x="-85" y="-55" width="170" height="110" rx="8" fill="#0f172a" stroke="#eab308" stroke-width="1.5" />
+    <rect x="-78" y="-48" width="156" height="96" rx="5" fill="#1e293b" fill-opacity="0.5" stroke="#ca8a04" stroke-dasharray="4,4" stroke-width="1" />
+    
+    <!-- Stylized Soundwaves / Rhythm -->
+    <g stroke="#eab308" stroke-width="2" stroke-linecap="round" opacity="0.6">
+      <line x1="-50" y1="0" x2="-50" y2="0" />
+      <line x1="-35" y1="-12" x2="-35" y2="12" />
+      <line x1="-20" y1="-22" x2="-20" y2="22" />
+      <line x1="-5" y1="-32" x2="-5" y2="32" />
+      <line x1="10" y1="-26" x2="10" y2="26" />
+      <line x1="25" y1="-18" x2="25" y2="18" />
+      <line x1="40" y1="-8" x2="40" y2="8" />
+    </g>
+
+    <!-- DJ Badge in Frame -->
+    <text x="0" y="32" fill="#94a3b8" font-family="sans-serif" font-weight="700" font-size="7" letter-spacing="1.5" text-anchor="middle">RESIDENT AFROBEAT SELECTORS</text>
+  </g>
+
+  <!-- DJ Lineup Section -->
+  <g transform="translate(200, 345)">
+    <text x="0" y="0" fill="#ffffff" font-family="Impact, sans-serif" font-size="24" letter-spacing="1" text-anchor="middle">DJ NEB &amp; DVJ JOJEZ</text>
+    <text x="0" y="16" fill="#ca8a04" font-family="sans-serif" font-weight="700" font-size="7.5" letter-spacing="2" text-anchor="middle">AFROBEATS • AMAPIANO • DANCEHALL</text>
+  </g>
+
+  <!-- Tuesday Special Offer Badge -->
+  <g transform="translate(200, 395)">
+    <rect x="-140" y="-14" width="280" height="28" rx="6" fill="#eab308" fill-opacity="0.12" stroke="#eab308" stroke-width="1.2" />
+    <text x="0" y="3" fill="#fef08a" font-family="sans-serif" font-weight="800" font-size="9" letter-spacing="1" text-anchor="middle">DISCOUNTS ON BEER BUCKETS &amp; COCKTAILS</text>
+  </g>
+
+  <!-- Footer Logistics -->
+  <g transform="translate(200, 442)">
+    <text x="0" y="0" fill="#ffffff" font-family="sans-serif" font-weight="700" font-size="8" letter-spacing="1.5" text-anchor="middle">DOORS OPEN 6:00 PM • FREE ENTRY</text>
+    <text x="0" y="12" fill="#64748b" font-family="sans-serif" font-weight="600" font-size="7" letter-spacing="1" text-anchor="middle">OZONE LOUNGE • @OZONELOUNGE</text>
+  </g>
+</svg>

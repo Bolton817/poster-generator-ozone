@@ -825,5 +825,72 @@ Implemented a production-grade multi-format export and batch packaging engine fo
 ### 6. Recommended Next Stage
 **Stage 13 — Saint Template (Tuesday African Night / Afrobeat)**: Implement the Tuesday African Night template renderer, African fabric motifs, warm earth/amber palette presets, and specialized lineup typography.
 
+---
+
+## Stage 13: Saint Template (Tuesday African Night / Afrobeat)
+
+* **Date:** 20 October 2026
+* **Status:** Complete (Gate G13 Passed)
+* **Git Commit / Branch:** Pending commit / master
+
+### 1. Summary of Changes
+Implemented the dedicated **Saint Template (Tuesday African Night / Afrobeat)** composition, fulfilling TDD Stage 13 (pages 84–85) and Blueprint Section 4.3.
+1. **Dedicated Vector Thumbnail (`public/template-thumbnails/saint.svg`)**:
+   - Created high-impact 400×500 vector SVG thumbnail with midnight slate background, saffron & amber asymmetric geometric blocks, "AFRICAN NIGHT" headline, and "TUESDAY AFRO" badge.
+2. **Template Registry Updates (`src/features/templates/registry.ts`)**:
+   - Linked `thumbnailUrl: "/template-thumbnails/saint.svg"` for `saint`.
+   - Refined typography presets: `bold-afrobeat` (display: `Bebas Neue`, body: `Inter`) and `afro-groove` (display: `Source Sans 3`, body: `Inter`).
+3. **SaintTemplate Composition Renderer (`src/components/poster/templates/SaintTemplate.tsx`)**:
+   - Master 1080 × 1350 px fixed coordinate space (`data-testid="saint-template-root"`).
+   - Asymmetric contemporary African club aesthetic with dynamic angled color blocks and interlocking geometric diamond/chevron pattern rhythm.
+   - Layout options: `geometric-frame` (angular framed hero container with dashed offset borders) and `pattern-pulse` (full-bleed photo with rhythmic pattern pulse).
+   - Pattern density controls (`subtle`, `medium`, `bold`).
+   - Verbatim copy: "AFRICAN NIGHT (AFRO)", featured DJs "DJ Neb & DVJ Jojez", and Tuesday beverage special "Discounts on beer buckets and cocktails."
+   - Dynamic layout rebalancing when offers or optional logistics are blank.
+4. **Renderer Resolver Wiring (`src/features/templates/renderers.tsx`)**:
+   - Replaced `PlaceholderTemplateRenderer` for `saint` with `SaintTemplate`.
+5. **Automated Verification Suite (`scripts/test-saint-template.ts`)**:
+   - Authored 30-test CLI verification suite covering registry metadata, canvas dimensions, 3 palette presets (Saffron & Ink, Electric Azure, Terracotta Pulse), layout options, typography pairings, verbatim copy, schema validation, renderer resolution, and export naming.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `public/template-thumbnails/saint.svg`: Dedicated SVG thumbnail for template gallery.
+  * `src/components/poster/templates/SaintTemplate.tsx`: Tuesday African Night template renderer.
+  * `scripts/test-saint-template.ts`: 30-test automated CLI verification suite.
+* **Changed**:
+  * `src/features/templates/registry.ts`: Added `thumbnailUrl` and updated font pairs for `saint`.
+  * `src/features/templates/renderers.tsx`: Mapped `saint: SaintTemplate`.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npx tsx scripts/test-saint-template.ts`: 30/30 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-batch-export.ts`: 33/33 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-draft-persistence.ts`: 16/16 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-reddington-vertical-slice.ts`: 20/20 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 tests passed (PASS).
+* `cmd /c npm run type-check`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Compiled 19 routes cleanly in 12.5s (PASS).
+* `node -e "(Smoke test: health, thumbnail, login, gallery, saint route)"`: All passed with HTTP 200 (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Saint template renderer implemented (Blueprint 4.3)** | **PASS** | `SaintTemplate.tsx` mounts 1080×1350 px unscaled master canvas with contemporary Afrobeat geometric design. |
+| **Three curated palette presets verified** | **PASS** | Saffron & Ink, Electric Azure, and Terracotta Pulse tested in `test-saint-template.ts` Suite 2 with valid hex codes. |
+| **Two layout options (geometric-frame vs pattern-pulse)** | **PASS** | Tested in Suite 3; both layout modes render predictably with selectable pattern density. |
+| **Verbatim copy & artist lineup integrity** | **PASS** | "African Night (Afro)", "DJ Neb", "DVJ Jojez", and "Discounts on beer buckets and cocktails." verified in Suite 4. |
+| **Conditional layout rebalancing** | **PASS** | Verified in Suite 5: blank offers or logistics omit elements cleanly without breaking composition. |
+| **Dedicated vector thumbnail in template gallery** | **PASS** | `saint.svg` created, linked in registry, and verified in gallery (/app/templates). |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Saint Template (Tuesday African Night / Afrobeat).
+* Did NOT implement templates 3–7 (Lannister, Shelby, Lothbrok, Escobar, Pinkman); reserved for Stages 14–18.
+* Preserved working auth, database, app shell, font, editor, and export foundations.
+
+### 6. Recommended Next Stage
+**Stage 14 — Lannister Template (Wednesday Groovy Wednesday / Disco / Dual-offer)**: Implement the Wednesday Groovy Wednesday template renderer, disco glow & lighting motifs, and dual-offer layout (Free koroga chicken primary + bottle/beer discounts secondary).
+
 
 

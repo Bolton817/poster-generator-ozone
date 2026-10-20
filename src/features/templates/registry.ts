@@ -232,9 +232,16 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
       {
         id: "bold-afrobeat",
         name: "Geometric Afro Display",
-        displayFont: "sans-serif",
-        bodyFont: "sans-serif",
-        labelFont: "sans-serif",
+        displayFont: "Bebas Neue",
+        bodyFont: "Inter",
+        labelFont: "Inter",
+      },
+      {
+        id: "afro-groove",
+        name: "Afrobeat Groove",
+        displayFont: "Source Sans 3",
+        bodyFont: "Inter",
+        labelFont: "Bebas Neue",
       },
     ],
     layoutOptions: [
@@ -242,6 +249,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
       { id: "pattern-pulse", name: "Pattern Pulse" },
     ],
     supportedImageSlots: ["background", "texture"],
+    thumbnailUrl: "/template-thumbnails/saint.svg",
     defaults: {
       schemaVersion: 1,
       templateId: "saint",
