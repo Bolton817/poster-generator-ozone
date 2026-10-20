@@ -23,6 +23,7 @@ export interface FullScreenPreviewModalProps {
   document: PosterDocument;
   template: TemplateDefinition;
   onExport: (format: "png" | "jpeg") => Promise<void>;
+  onOpenExportModal?: () => void;
   isExporting: boolean;
   exportSuccessMsg?: string | null;
   exportError?: string | null;
@@ -34,6 +35,7 @@ export function FullScreenPreviewModal({
   document,
   template,
   onExport,
+  onOpenExportModal,
   isExporting,
   exportSuccessMsg,
   exportError,
@@ -122,35 +124,54 @@ export function FullScreenPreviewModal({
             </span>
           </button>
 
-          {/* Export PNG */}
-          <button
-            type="button"
-            onClick={() => onExport("png")}
-            disabled={isExporting}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 disabled:opacity-50 transition-colors shadow-lg shadow-amber-500/10"
-          >
-            {isExporting ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Download className="w-3.5 h-3.5" />
-            )}
-            <span>Export PNG</span>
-          </button>
+          {/* Export Action */}
+          {onOpenExportModal ? (
+            <button
+              type="button"
+              onClick={onOpenExportModal}
+              disabled={isExporting}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 disabled:opacity-50 transition-colors shadow-lg shadow-amber-500/10"
+            >
+              {isExporting ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Download className="w-3.5 h-3.5" />
+              )}
+              <span>Export Poster</span>
+            </button>
+          ) : (
+            <>
+              {/* Export PNG */}
+              <button
+                type="button"
+                onClick={() => onExport("png")}
+                disabled={isExporting}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 disabled:opacity-50 transition-colors shadow-lg shadow-amber-500/10"
+              >
+                {isExporting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Download className="w-3.5 h-3.5" />
+                )}
+                <span>Export PNG</span>
+              </button>
 
-          {/* Export JPEG */}
-          <button
-            type="button"
-            onClick={() => onExport("jpeg")}
-            disabled={isExporting}
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700 active:bg-slate-600 text-slate-200 border border-slate-700/80 disabled:opacity-50 transition-colors"
-          >
-            {isExporting ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Download className="w-3.5 h-3.5" />
-            )}
-            <span>JPEG</span>
-          </button>
+              {/* Export JPEG */}
+              <button
+                type="button"
+                onClick={() => onExport("jpeg")}
+                disabled={isExporting}
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700 active:bg-slate-600 text-slate-200 border border-slate-700/80 disabled:opacity-50 transition-colors"
+              >
+                {isExporting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Download className="w-3.5 h-3.5" />
+                )}
+                <span>JPEG</span>
+              </button>
+            </>
+          )}
         </div>
       </header>
 

@@ -1,12 +1,63 @@
 /**
  * Poster Export Service Boundary & Adapter Contracts
  *
- * Implements TDD Part II Section "Export service boundary" (Page 35) & Stage 07 POC:
+ * Implements TDD Part II Section "Export service boundary" (Page 35),
+ * Stage 07 POC & Stage 12 Multi-Format / Batch Packaging:
  * - Decouples rendering technology (html-to-image or server-side) from editor/preview state
- * - Provides strict typing for format, quality, result metadata, and diagnostic errors
+ * - Provides strict typing for format, quality presets, result metadata, and diagnostic errors
+ * - Supports batch weekly packaging contracts
  */
 
+import { PosterDocument } from "../poster/schema";
+
 export type ExportFormat = "png" | "jpeg";
+
+export type JpegQualityPreset = "maximum" | "high" | "compact";
+
+export interface ExportPresetOption {
+  id: "png" | "jpeg-max" | "jpeg-high" | "jpeg-compact";
+  format: ExportFormat;
+  quality?: number;
+  label: string;
+  description: string;
+  estimatedSize: string;
+  isDefault?: boolean;
+}
+
+export const EXPORT_PRESETS: Record<ExportPresetOption["id"], ExportPresetOption> = {
+  png: {
+    id: "png",
+    format: "png",
+    label: "Master Lossless PNG",
+    description: "Crisp vector text and graphics; best for official print & high-res screens.",
+    estimatedSize: "~1.5 – 3.5 MB",
+    isDefault: true,
+  },
+  "jpeg-max": {
+    id: "jpeg-max",
+    format: "jpeg",
+    quality: 0.95,
+    label: "Maximum Fidelity JPEG (95%)",
+    description: "Minimal compression artifacts with reduced file size for social sharing.",
+    estimatedSize: "~400 – 800 KB",
+  },
+  "jpeg-high": {
+    id: "jpeg-high",
+    format: "jpeg",
+    quality: 0.85,
+    label: "Social & WhatsApp JPEG (85%)",
+    description: "Optimized for fast mobile messaging, statuses, and feed uploads.",
+    estimatedSize: "~150 – 300 KB",
+  },
+  "jpeg-compact": {
+    id: "jpeg-compact",
+    format: "jpeg",
+    quality: 0.75,
+    label: "Compact Mobile JPEG (75%)",
+    description: "Ultra-compact payload for low-bandwidth cellular environments.",
+    estimatedSize: "~100 – 200 KB",
+  },
+};
 
 export interface ExportOptions {
   /** Target image format. Default: "png" */
@@ -63,4 +114,35 @@ export class ExportError extends Error {
  */
 export interface PosterExporter {
   rasterize(element: HTMLElement, options?: ExportOptions): Promise<ExportResult>;
+}
+
+/**
+ * Batch packaging definitions
+ */
+export interface BatchExportItem {
+  id: string;
+  title: string;
+  templateId: string;
+  dayLabel: string;
+  document: PosterDocument;
+}
+
+export type BatchPhase = "idle" | "rendering" | "zipping" | "complete" | "error";
+
+export interface BatchExportProgress {
+  total: number;
+  current: number;
+  currentTitle: string;
+  dayLabel: string;
+  phase: BatchPhase;
+  percent: number;
+  errorMsg?: string;
+}
+
+export interface BatchExportResult {
+  zipBlob: Blob;
+  fileName: string;
+  totalFiles: number;
+  byteSize: number;
+  durationMs: number;
 }

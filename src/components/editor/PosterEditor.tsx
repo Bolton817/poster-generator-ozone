@@ -17,6 +17,7 @@ import { injectFontFace, waitForFontsReady } from "@/features/fonts/font-loader"
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { FullScreenPreviewModal } from "@/components/preview/FullScreenPreviewModal";
+import { ExportModal } from "@/components/export/ExportModal";
 import { useAutoSave } from "@/features/drafts/use-auto-save";
 import {
   ArrowLeft,
@@ -57,6 +58,9 @@ export function PosterEditor({ draftId: initialDraftId }: PosterEditorProps = {}
 
   // Full-screen modal preview state (Stage 10)
   const [showFullscreenPreview, setShowFullscreenPreview] = useState(false);
+
+  // Production export modal (Stage 12)
+  const [showExportModal, setShowExportModal] = useState(false);
 
   // Auto-save integration (Stage 11)
   const {
@@ -271,39 +275,22 @@ export function PosterEditor({ draftId: initialDraftId }: PosterEditorProps = {}
             <span className="hidden sm:inline">Save</span>
           </Button>
 
-          {/* Export Action Buttons */}
-          <div className="flex items-center gap-1 bg-slate-950 p-0.5 rounded-lg border border-slate-800">
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              disabled={isExporting}
-              onClick={() => handleExport("png")}
-              className="text-xs flex items-center gap-1.5"
-            >
-              {isExporting ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span className="hidden sm:inline">Exporting...</span>
-                </>
-              ) : (
-                <>
-                  <Download className="w-3.5 h-3.5" />
-                  <span>PNG</span>
-                </>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isExporting}
-              onClick={() => handleExport("jpeg")}
-              className="text-xs hidden sm:flex items-center gap-1 border-slate-800 text-slate-300 hover:text-white"
-            >
-              <span>JPEG</span>
-            </Button>
-          </div>
+          {/* Export Action Button */}
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            disabled={isExporting}
+            onClick={() => setShowExportModal(true)}
+            className="text-xs flex items-center gap-1.5 shadow-sm shadow-amber-500/10"
+          >
+            {isExporting ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Download className="w-3.5 h-3.5" />
+            )}
+            <span>Export</span>
+          </Button>
         </div>
       </header>
 
@@ -463,9 +450,19 @@ export function PosterEditor({ draftId: initialDraftId }: PosterEditorProps = {}
         document={document}
         template={template}
         onExport={handleExport}
+        onOpenExportModal={() => setShowExportModal(true)}
         isExporting={isExporting}
         exportSuccessMsg={exportSuccessMsg}
         exportError={exportError}
+      />
+
+      {/* Production Export Modal (Stage 12) */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        document={document}
+        template={template}
+        canvasElement={canvasRef.current}
       />
     </div>
   );

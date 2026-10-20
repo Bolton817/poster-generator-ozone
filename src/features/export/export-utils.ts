@@ -1,8 +1,8 @@
 /**
- * Export Utility Helpers: Filename Sanitization, Blob Downloads & Dimension Inspection
+ * Export Utility Helpers: Filename Sanitization, Blob Downloads, Web Share & Dimension Inspection
  */
 
-import { ExportFormat } from "./types";
+import { ExportFormat, ExportResult, JpegQualityPreset } from "./types";
 
 export interface FileNameParams {
   day?: string;
@@ -38,6 +38,33 @@ export function generatePosterFileName({
 }
 
 /**
+ * Generates a standardized batch weekly zip archive filename:
+ * Ozone-Lounge-Weekly-Posters-YYYY-MM-DD.zip
+ */
+export function generateBatchZipFileName(date: Date = new Date()): string {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `Ozone-Lounge-Weekly-Posters-${yyyy}-${mm}-${dd}.zip`;
+}
+
+/**
+ * Maps a JPEG quality preset to a numeric compression factor (0.1 - 1.0).
+ */
+export function getQualityForPreset(preset: JpegQualityPreset): number {
+  switch (preset) {
+    case "maximum":
+      return 0.95;
+    case "high":
+      return 0.85;
+    case "compact":
+      return 0.75;
+    default:
+      return 0.95;
+  }
+}
+
+/**
  * Triggers a client-side browser file download from a Blob with safe URL revocation.
  */
 export function triggerBlobDownload(blob: Blob, fileName: string): void {
@@ -59,6 +86,67 @@ export function triggerBlobDownload(blob: Blob, fileName: string): void {
       URL.revokeObjectURL(objectUrl);
     }, 2000);
   }
+}
+
+/**
+ * Checks if the W3C Web Share API is available and capable of sharing files on this device.
+ */
+export function canWebShareFiles(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return false;
+  }
+
+  if (typeof navigator.share !== "function" || typeof navigator.canShare !== "function") {
+    return false;
+  }
+
+  try {
+    // Test with a dummy file representation
+    const testFile = new File(["test"], "test.png", { type: "image/png" });
+    return navigator.canShare({ files: [testFile] });
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Attempts to share the exported poster using the native mobile share sheet (WhatsApp, Stories, AirDrop).
+ * If the Web Share API is not supported, cancelled, or fails, gracefully falls back to downloading the file.
+ */
+export async function shareOrDownloadPoster(
+  result: ExportResult,
+  title?: string
+): Promise<"shared" | "downloaded"> {
+  if (typeof window === "undefined") {
+    return "downloaded";
+  }
+
+  if (canWebShareFiles()) {
+    try {
+      const file = new File([result.blob], result.fileName, {
+        type: result.mimeType,
+      });
+
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: title || result.fileName,
+          text: `Ozone Lounge Event Poster — ${title || result.fileName}`,
+        });
+        return "shared";
+      }
+    } catch (err: unknown) {
+      // User cancellation (AbortError) should not trigger fallback download
+      if (err instanceof Error && err.name === "AbortError") {
+        return "shared";
+      }
+      console.warn("[shareOrDownloadPoster] Web Share API failed, falling back to download:", err);
+    }
+  }
+
+  // Fallback: standard browser file download
+  triggerBlobDownload(result.blob, result.fileName);
+  return "downloaded";
 }
 
 /**

@@ -8,7 +8,13 @@ import { DraftCard } from "./DraftCard";
 import { DeleteDraftDialog } from "./DeleteDraftDialog";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { FolderOpen, Search, Plus, AlertCircle, CheckCircle2 } from "lucide-react";
+import { FolderOpen, Search, Plus, AlertCircle, CheckCircle2, Archive, Loader2 } from "lucide-react";
+import { BatchExportModal } from "@/components/export/BatchExportModal";
+import {
+  loadDraftBatchItems,
+  getWeeklyTemplateBatchItems,
+} from "@/features/export/batch-export-service";
+import { BatchExportItem } from "@/features/export/types";
 
 export interface DraftsListProps {
   initialDrafts: DraftSummary[];
@@ -20,6 +26,9 @@ export function DraftsList({ initialDrafts }: DraftsListProps) {
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const [deletingDraft, setDeletingDraft] = useState<DraftSummary | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+  const [batchItems, setBatchItems] = useState<BatchExportItem[]>([]);
+  const [isLoadingBatch, setIsLoadingBatch] = useState(false);
   const [notification, setNotification] = useState<{
     type: "success" | "error";
     message: string;
@@ -73,6 +82,25 @@ export function DraftsList({ initialDrafts }: DraftsListProps) {
     }
   };
 
+  const handleOpenBatchExport = async () => {
+    setIsLoadingBatch(true);
+    try {
+      if (drafts.length > 0) {
+        const items = await loadDraftBatchItems(drafts);
+        setBatchItems(items);
+      } else {
+        const items = await getWeeklyTemplateBatchItems();
+        setBatchItems(items);
+      }
+      setIsBatchModalOpen(true);
+    } catch (err: unknown) {
+      console.error("[DraftsList] Batch load error:", err);
+      showNotification("error", "Failed to load drafts for batch export");
+    } finally {
+      setIsLoadingBatch(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Notifications */}
@@ -102,7 +130,7 @@ export function DraftsList({ initialDrafts }: DraftsListProps) {
         </div>
       )}
 
-      {/* Header with Search and New Poster CTA */}
+      {/* Header with Search and Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">
@@ -113,7 +141,23 @@ export function DraftsList({ initialDrafts }: DraftsListProps) {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleOpenBatchExport}
+            disabled={isLoadingBatch}
+            className="gap-2 border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200"
+          >
+            {isLoadingBatch ? (
+              <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+            ) : (
+              <Archive className="w-4 h-4 text-amber-400" />
+            )}
+            <span>Batch Export (.ZIP)</span>
+          </Button>
+
           <Link href="/app/templates">
             <Button size="sm" className="gap-2">
               <Plus className="w-4 h-4" />
@@ -185,6 +229,13 @@ export function DraftsList({ initialDrafts }: DraftsListProps) {
         isDeleting={isDeleting}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeletingDraft(null)}
+      />
+
+      {/* Batch Export Modal */}
+      <BatchExportModal
+        isOpen={isBatchModalOpen}
+        onClose={() => setIsBatchModalOpen(false)}
+        availableItems={batchItems}
       />
     </div>
   );
