@@ -17,6 +17,7 @@ import { injectFontFace, waitForFontsReady } from "@/features/fonts/font-loader"
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { FullScreenPreviewModal } from "@/components/preview/FullScreenPreviewModal";
+import { useAutoSave } from "@/features/drafts/use-auto-save";
 import {
   ArrowLeft,
   RotateCcw,
@@ -27,9 +28,15 @@ import {
   AlertCircle,
   CheckCircle2,
   Maximize2,
+  Save,
 } from "lucide-react";
 
-export function PosterEditor() {
+export interface PosterEditorProps {
+  draftId?: string;
+  initialDraftName?: string;
+}
+
+export function PosterEditor({ draftId: initialDraftId }: PosterEditorProps = {}) {
   const router = useRouter();
   const { state, template, resetToDefaults } = useEditor();
   const { document, isDirty, warnings } = state;
@@ -50,6 +57,24 @@ export function PosterEditor() {
 
   // Full-screen modal preview state (Stage 10)
   const [showFullscreenPreview, setShowFullscreenPreview] = useState(false);
+
+  // Auto-save integration (Stage 11)
+  const {
+    status: saveStatus,
+    lastSavedAt,
+    error: saveError,
+    saveNow,
+    isSaving,
+  } = useAutoSave({
+    document,
+    isDirty,
+    initialDraftId,
+    onDraftCreated: (newDraft) => {
+      if (typeof window !== "undefined") {
+        window.history.replaceState(null, "", `/app/drafts/${newDraft.id}`);
+      }
+    },
+  });
 
   // Preload and inject template fonts on mount
   useEffect(() => {
@@ -141,9 +166,24 @@ export function PosterEditor() {
             </span>
           </div>
 
-          {/* Dirty State Indicator */}
+          {/* Auto-Save Status Indicator (Stage 11) */}
           <div className="hidden md:flex items-center gap-1.5 text-xs">
-            {isDirty ? (
+            {saveStatus === "saving" ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[11px] font-medium">
+                <RefreshCw className="w-3 h-3 animate-spin text-amber-400" />
+                Saving...
+              </span>
+            ) : saveStatus === "error" ? (
+              <button
+                type="button"
+                onClick={() => saveNow()}
+                title={saveError || "Save failed"}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/30 text-[11px] font-medium hover:bg-rose-500/20"
+              >
+                <AlertCircle className="w-3 h-3 text-rose-400" />
+                Save failed — Retry
+              </button>
+            ) : isDirty || saveStatus === "dirty" ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[11px] font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                 Unsaved edits
@@ -151,7 +191,9 @@ export function PosterEditor() {
             ) : (
               <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
                 <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                In sync
+                {lastSavedAt
+                  ? `Saved ${lastSavedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                  : "In sync"}
               </span>
             )}
           </div>
@@ -210,6 +252,23 @@ export function PosterEditor() {
           >
             <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden sm:inline">Preview</span>
+          </Button>
+
+          {/* Save Draft Action (Stage 11) */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => saveNow()}
+            disabled={isSaving}
+            className="text-xs flex items-center gap-1.5 border-slate-700/80 bg-slate-800/60 hover:bg-slate-700 text-slate-200"
+          >
+            {isSaving ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
+            ) : (
+              <Save className="w-3.5 h-3.5 text-amber-400" />
+            )}
+            <span className="hidden sm:inline">Save</span>
           </Button>
 
           {/* Export Action Buttons */}

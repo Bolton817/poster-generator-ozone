@@ -659,5 +659,86 @@ Designed, engineered, and verified the complete **Full-Screen Poster Preview and
 ### 6. Recommended Next Stage
 **Stage 11 — Draft Persistence, Auto-Save, and Draft Management Workspace** (Supabase draft autosave, list/load/delete drafts workspace, offline retry).
 
+---
+
+## Stage 11: Draft Persistence, Auto-Save, and Draft Management Workspace
+
+* **Date:** 20 October 2026
+* **Status:** Complete (Gate G3/G4 Passed)
+* **Git Commit / Branch:** master
+
+### 1. Summary of Changes
+Delivered the end-to-end **Draft Persistence, Auto-Save, and Draft Management Workspace** per TDD Stage 11 (pp. 80–81), Blueprint Section 8.3 & Section 14.2, and Production Decision 08:
+1. **Prisma & REST API Endpoints (`src/app/api/drafts/`)**:
+   - `GET /api/drafts`: Lists all saved drafts for the authenticated operator ordered by `updatedAt: "desc"`.
+   - `POST /api/drafts`: Creates a new poster draft, strictly validating `PosterDocument` with Zod before persisting in PostgreSQL.
+   - `GET /api/drafts/[draftId]`: Loads single draft by ID, strictly owner-scoped (`userId = session.user.id`).
+   - `PUT /api/drafts/[draftId]`: Updates draft document and title with real-time `updatedAt` tracking.
+   - `DELETE /api/drafts/[draftId]`: Removes draft belonging to the authenticated owner.
+   - `POST /api/drafts/[draftId]/duplicate`: Clones draft and document JSON into a new record with `"Copy of "` prefix.
+2. **Auto-Save & Manual Save Integration (`src/features/drafts/use-auto-save.ts` & `src/components/editor/PosterEditor.tsx`)**:
+   - Built `useAutoSave` custom hook: debounces in-memory edits 2,000ms after the last edit when `isDirty === true`.
+   - Integrated status pill in toolbar displaying: `Unsaved edits`, `Saving...`, `Saved [timestamp]`, and `Save failed — Retry`.
+   - Added manual **"Save Draft"** action button in top toolbar with spinning loading indicator.
+   - On initial save of a template document, creates a draft and updates browser URL to `/app/drafts/[draftId]` seamlessly via `window.history.replaceState`.
+3. **Dedicated Draft Editor Route (`src/app/app/drafts/[draftId]/page.tsx`)**:
+   - Implemented dynamic App Router route loading saved draft JSON from PostgreSQL, validating template ID, and booting `PosterEditor` in clean state.
+4. **Drafts Management Workspace (`src/app/app/drafts/page.tsx` & `src/components/drafts/`)**:
+   - Built `DraftsList` client component with live search filtering by title and template.
+   - Built `DraftCard` with quick actions: Open in Editor, Duplicate, and Delete.
+   - Built `DeleteDraftDialog` accessible confirmation modal with focus trapping to prevent accidental data loss.
+5. **Comprehensive Verification Suite (`scripts/test-draft-persistence.ts`)**:
+   - Authored 16-test automated CLI test suite covering owner isolation, CRUD lifecycle, draft duplication with independent JSON state, malformed payload rejection, and auto-save state machine transitions.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `src/features/drafts/types.ts`: TypeScript contracts for draft summaries, details, payloads, and auto-save state.
+  * `src/features/drafts/drafts-client.ts`: Client fetch wrappers for list, get, create, update, delete, duplicate.
+  * `src/features/drafts/use-auto-save.ts`: Custom hook for debounced auto-save and status tracking.
+  * `src/components/drafts/DraftCard.tsx`: Interactive draft card component with quick actions.
+  * `src/components/drafts/DeleteDraftDialog.tsx`: Accessible deletion confirmation modal.
+  * `src/components/drafts/DraftsList.tsx`: Searchable drafts workspace dashboard.
+  * `src/app/api/drafts/route.ts`: API handler for listing and creating drafts.
+  * `src/app/api/drafts/[draftId]/route.ts`: API handler for getting, updating, and deleting a draft.
+  * `src/app/api/drafts/[draftId]/duplicate/route.ts`: API handler for duplicating a draft.
+  * `src/app/app/drafts/[draftId]/page.tsx`: Dedicated draft editor dynamic route.
+  * `scripts/test-draft-persistence.ts`: 16-test automated CLI test suite.
+* **Changed**:
+  * `src/app/app/drafts/page.tsx`: Connected to interactive `DraftsList` with server-side Prisma fetch.
+  * `src/components/editor/PosterEditor.tsx`: Wired `draftId`, `useAutoSave`, and manual Save button.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npx tsx scripts/test-draft-persistence.ts`: 16/16 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-preview-and-zoom.ts`: 22/22 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-reddington-vertical-slice.ts`: 20/20 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-editor-framework.ts`: 31/31 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-canvas-export.ts`: 19/19 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 tests passed (PASS).
+* `cmd /c npm run type-check`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Compiled 19 routes cleanly in 9.0s (PASS).
+* `node -e "(Smoke test: health, login, list drafts, create draft, open draft page, duplicate, delete)"`: All passed with HTTP 200/201 (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Owner-scoped draft authorization (Decision 08)** | **PASS** | Verified in `scripts/test-draft-persistence.ts` Suite 1: Franklin cannot query or access Bolton's drafts. |
+| **Draft lifecycle (Create, Read, Update, Delete)** | **PASS** | Verified in Suite 2: drafts accurately persist JSON document, title, and styling tokens in PostgreSQL. |
+| **Draft duplication with independent JSON state** | **PASS** | Verified in Suite 3: duplicate receives unique ID; mutations to duplicate do not affect source draft. |
+| **Auto-save debounced with clear status feedback** | **PASS** | `use-auto-save.ts` debounces 2,000ms; status badge shows saving, saved, and retry paths. |
+| **Direct draft editor route (/app/drafts/[draftId])** | **PASS** | Route verified live: loads saved draft JSON and mounts editor with initial document. |
+| **Delete confirmation protects against accidental loss** | **PASS** | `DeleteDraftDialog.tsx` requires explicit user confirmation before DELETE API execution. |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Draft Persistence, Auto-Save, and Draft Management Workspace.
+* Did NOT implement batch weekly export or zip bundling (scheduled for Stage 12).
+* Did NOT design templates 2–7 (Saint, Lannister, Shelby, Lothbrok, Escobar, Pinkman); reserved for Stages 13–18.
+* Preserved working auth, database, app shell, font, editor, and preview foundations.
+
+### 6. Recommended Next Stage
+**Stage 12 — Multi-Format Export Engine and Batch Packaging** (PNG/JPEG export quality tuning, batch export, and zip download packaging).
+
 
 
