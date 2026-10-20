@@ -960,6 +960,77 @@ Deliver a visually loud midweek disco party aesthetic with neon glow, lighting r
 ### 6. Recommended Next Stage
 **Stage 15 — Shelby Template (Thursday Karaoke Night / Stage / Performers)**: Implement the Thursday Karaoke Night template renderer, theatrical stage spotlights, microphone accents, and dedicated separated fields for hosts and DJs.
 
+---
+
+## 2026-10-20 — Stage 15: Shelby Template (Thursday Karaoke Night / Stage / Performers)
+
+### 1. Goal
+Implement the fourth dedicated daily composition renderer: **Shelby** for **Thursday Karaoke Night**, strictly following Blueprint Section 4.5 and TDD specifications (pages 87–88).
+
+Capture theatrical karaoke-night energy, evoking looking toward a lit stage with dramatic spotlight cones, vintage microphone accents, strong typography, strict visual separation of **Hosts** (**Bellah Harriet & Tito Wagithomo**) from **DJ** (**DJ Fab**), alongside an unmistakable presentation of the conditional singer perk (**"Free tequila shots for singers."**) separated from general bar discounts (**"Discounts on gin, rum and vodka."**).
+
+### 2. Implementation Summary
+* **Shelby Vector Thumbnail** (`public/template-thumbnails/shelby.svg`): Created 400 × 500 px vector thumbnail with deep stage crimson/velvet background (`#120206`), overhead crossing theatrical spotlight cones, vintage microphone emblem, "KARAOKE NIGHT" marquee headline, separate host badge ("HOSTS: BELLAH & TITO") and DJ badge ("DJ: FAB"), and singer tequila perk teaser.
+* **Template Registry Refinements** (`src/features/templates/registry.ts`):
+  * Attached `thumbnailUrl: "/template-thumbnails/shelby.svg"`.
+  * Refined typography pairing presets: `theatrical-stage` (`Bebas Neue` display + `Inter` body/labels) and `broadway-lights` (`Source Sans 3` display + `Inter` body + `Bebas Neue` labels).
+  * Configured default decoration tokens: `{ spotlightAngle: 45, showMicrophoneMotif: true, spotlightIntensity: "dramatic" }`.
+* **Shelby Template Component** (`src/components/poster/templates/ShelbyTemplate.tsx`):
+  * Master dimensions: unscaled 1080 × 1350 px canvas (`data-testid="shelby-template-root"`).
+  * Layer 1: Theatrical stage lighting with overhead truss bar, dramatic spotlight cones (overhead centered for `spotlight-cone` or crossing for `split-role-stage`), stage floor reflection, and decorative corner stage brackets.
+  * Layer 2: Stage performer / crowd background image slot (`assets.backgroundAssetId`) with focal point control (`focalPoints.background`), luminosity blend, and stage vignette overlay.
+  * Layer 3: Top header branding ("OZONE LOUNGE"), "THURSDAY LIVE STAGE" subtag, animated "LIVE ON STAGE" badge, and optional date/time tags.
+  * Layer 4: Vintage microphone SVG emblem with metallic accents, oversized "KARAOKE NIGHT" headline with crimson/gold gradient and stage light drop-shadow, and sing-along subtitle prompt.
+  * Layer 5: **Strict Role Separation (Blueprint 4.5 Mandate)**:
+    * Hosts module: Dedicated to **Bellah Harriet & Tito Wagithomo** with microphone badge and distinct styling.
+    * DJ module: Dedicated to **DJ Fab** with audio/decks badge and purple accent styling.
+  * Layer 6: **Unmistakable Conditional Offer Qualification (Blueprint 4.5 Mandate)**:
+    * Primary singer perk: *"Free tequila shots for singers."* with glowing gold/crimson card, "SINGERS ONLY • ON STAGE PRIVILEGE" badge, and unmistakable qualification.
+    * Secondary bar discounts: *"Discounts on gin, rum and vodka."* in a distinct bar discount ribbon.
+  * Layer 7: Footer with Ozone Lounge branding, operational logistics, and `@ozonelounge` social handle.
+  * Dynamic layout rebalancing when hosts, DJ, offers, or event logistics are empty.
+* **Renderer Resolver Integration** (`src/features/templates/renderers.tsx`):
+  * Mapped `shelby: ShelbyTemplate` in `TEMPLATE_RENDERERS`.
+* **Comprehensive Test Suite** (`scripts/test-shelby-template.ts`):
+  * 40/40 automated tests passing across 8 test suites.
+* **Regression & Build Verification**:
+  * All regression test suites passed (Lannister 39/39, Saint 30/30, Batch Export 33/33, Draft Persistence 16/16, Reddington 20/20, Registry 5/5).
+  * Next.js production build (`npm run build`) succeeded in 15.9s with 19 static/dynamic routes.
+  * Live HTTP smoke tests verified on port 3005.
+
+### 3. Verification Commands & Results
+* `cmd /c npx tsx scripts/test-shelby-template.ts`: 40/40 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-lannister-template.ts`: 39/39 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-saint-template.ts`: 30/30 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-batch-export.ts`: 33/33 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-draft-persistence.ts`: 16/16 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-reddington-vertical-slice.ts`: 20/20 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 tests passed (PASS).
+* `cmd /c npm run build`: Compiled 19 routes cleanly in 15.9s (PASS).
+* `Live smoke test (port 3005)`: Health (200), Shelby thumbnail (200), Auth login (200), Templates gallery (200), Shelby editor route (200) (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Shelby template renderer implemented (Blueprint 4.5)** | **PASS** | `ShelbyTemplate.tsx` mounts 1080×1350 px unscaled master canvas with theatrical stage & spotlight aesthetic. |
+| **Strict role separation (Hosts vs DJ)** | **PASS** | Dedicated, separated modules for Hosts (Bellah Harriet & Tito Wagithomo) and DJ (DJ Fab), verified in `test-shelby-template.ts` Suite 5 & 6. |
+| **Singer condition unmistakable** | **PASS** | Primary "Free tequila shots for singers." features prominent "SINGERS ONLY" condition badge, clearly isolated from spirits discount. |
+| **Three curated palette presets verified** | **PASS** | Stage Crimson, Midnight Violet, and Spotlight Gold verified in Suite 2. |
+| **Two layout options (spotlight-cone vs split-role-stage)** | **PASS** | Both layout modes supported with configurable spotlight angles in Suite 4. |
+| **Verbatim copy & artist lineup integrity** | **PASS** | "Karaoke Night", hosts, DJ, and offers verified in Suite 5. |
+| **Conditional layout rebalancing** | **PASS** | Verified in Suite 6: blank offers, DJ-only, Hosts-only, or blank logistics rebalance cleanly without breaking composition. |
+| **Dedicated vector thumbnail in template gallery** | **PASS** | `shelby.svg` created, linked in registry, and verified in gallery (/app/templates). |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Shelby Template (Thursday Karaoke Night / Stage / Performers).
+* Did NOT implement templates 5–7 (Lothbrok, Escobar, Pinkman); reserved for Stages 16–18.
+* Preserved working auth, database, app shell, font, editor, and export foundations.
+
+### 6. Recommended Next Stage
+**Stage 16 — Lothbrok Template (Friday Flight Fridays / Premium Nightlife / Offer-Free Rebalancing)**: Implement the Friday Flight Fridays template renderer, sleek motion/diagonal framing, premium nightlife aesthetic, and mandatory offer-free layout rebalancing (zero empty card or placeholder text per Decision 06).
+
+
 
 
 

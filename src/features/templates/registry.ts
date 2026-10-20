@@ -383,6 +383,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     tag: "Best for Karaoke Night",
     description: "Microphones, stage spotlights and a lively sing-along atmosphere.",
     templateVersion: 1,
+    thumbnailUrl: "/template-thumbnails/shelby.svg",
     palettePresets: [
       {
         id: "stage-crimson",
@@ -416,9 +417,16 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
       {
         id: "theatrical-stage",
         name: "Dramatic Headline & Condensed Roles",
-        displayFont: "serif",
-        bodyFont: "sans-serif",
-        labelFont: "sans-serif",
+        displayFont: "Bebas Neue",
+        bodyFont: "Inter",
+        labelFont: "Inter",
+      },
+      {
+        id: "broadway-lights",
+        name: "Broadway Lights & Sans",
+        displayFont: "Source Sans 3",
+        bodyFont: "Inter",
+        labelFont: "Bebas Neue",
       },
     ],
     layoutOptions: [
@@ -452,7 +460,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
         paletteId: "stage-crimson",
         typographyPresetId: "theatrical-stage",
         layoutOptionId: "spotlight-cone",
-        decorationOptions: { spotlightAngle: 45 },
+        decorationOptions: { spotlightAngle: 45, showMicrophoneMotif: true, spotlightIntensity: "dramatic" },
         focalPoints: { background: { x: 0.5, y: 0.5 } },
       },
     },

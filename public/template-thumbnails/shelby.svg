@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="100%" height="100%">
+  <defs>
+    <!-- Overhead Stage Spotlight Cone Gradient -->
+    <linearGradient id="shelbySpotlightCone" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#fda4af" stop-opacity="0.45" />
+      <stop offset="40%" stop-color="#e11d48" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#120206" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Crossing Accent Spotlight -->
+    <linearGradient id="shelbyCrossSpot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.3" />
+      <stop offset="60%" stop-color="#e11d48" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#120206" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Gold Accent for Singer Perk -->
+    <linearGradient id="shelbyGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+
+    <!-- Stage Headline Gradient -->
+    <linearGradient id="shelbyHeadlineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="35%" stop-color="#fda4af" />
+      <stop offset="100%" stop-color="#e11d48" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="shelbyStageGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Stage Crimson/Velvet Background -->
+  <rect width="400" height="500" fill="#120206" />
+
+  <!-- Overhead Theatrical Lighting Truss Bar -->
+  <line x1="20" y1="20" x2="380" y2="20" stroke="#e11d48" stroke-opacity="0.4" stroke-width="2" />
+  <circle cx="100" cy="20" r="3" fill="#fda4af" />
+  <circle cx="200" cy="20" r="4" fill="#ffffff" />
+  <circle cx="300" cy="20" r="3" fill="#fda4af" />
+
+  <!-- Overhead Theatrical Spotlight Cones -->
+  <polygon points="180,20 220,20 370,480 30,480" fill="url(#shelbySpotlightCone)" />
+  <polygon points="80,20 120,20 330,420 210,420" fill="url(#shelbyCrossSpot)" />
+  <polygon points="320,20 280,20 70,420 190,420" fill="url(#shelbyCrossSpot)" />
+
+  <!-- Stage Floor Horizon & Warm Reflection Oval -->
+  <ellipse cx="200" cy="460" rx="170" ry="26" fill="#e11d48" fill-opacity="0.12" />
+
+  <!-- Theatrical Outer Frame Accent -->
+  <rect x="18" y="18" width="364" height="464" rx="8" fill="none" stroke="#e11d48" stroke-opacity="0.3" stroke-width="1.5" />
+  <rect x="22" y="22" width="356" height="456" rx="6" fill="none" stroke="#fda4af" stroke-opacity="0.12" stroke-width="0.8" />
+
+  <!-- Top Header: Ozone Lounge & Template Tag -->
+  <g transform="translate(32, 42)">
+    <text x="0" y="0" fill="#ffffff" font-family="sans-serif" font-weight="900" font-size="10" letter-spacing="1.5">OZONE LOUNGE</text>
+    <text x="0" y="10" fill="#f43f5e" font-family="sans-serif" font-weight="700" font-size="7" letter-spacing="1">THURSDAY LIVE STAGE</text>
+  </g>
+
+  <g transform="translate(368, 42)">
+    <rect x="-60" y="-10" width="60" height="18" rx="4" fill="#e11d48" fill-opacity="0.25" stroke="#e11d48" stroke-opacity="0.6" stroke-width="1" />
+    <text x="-30" y="2.5" fill="#fda4af" font-family="sans-serif" font-weight="800" font-size="7.5" letter-spacing="1" text-anchor="middle">SHELBY</text>
+  </g>
+
+  <!-- Tag Pill -->
+  <g transform="translate(200, 78)">
+    <rect x="-65" y="-9" width="130" height="18" rx="9" fill="#e11d48" fill-opacity="0.25" stroke="#fda4af" stroke-opacity="0.5" stroke-width="1" />
+    <text x="0" y="3" fill="#fff1f2" font-family="sans-serif" font-weight="800" font-size="7.5" letter-spacing="2" text-anchor="middle">LIVE KARAOKE STAGE</text>
+  </g>
+
+  <!-- Center Stage Visual: Vintage Microphone Motif -->
+  <g transform="translate(200, 114)">
+    <!-- Stage Aura Ring -->
+    <circle cx="0" cy="10" r="24" fill="#e11d48" fill-opacity="0.25" stroke="#fda4af" stroke-opacity="0.4" stroke-width="1" />
+    
+    <!-- Vintage Pill Microphone Body -->
+    <rect x="-6" y="-2" width="12" height="18" rx="6" fill="#f43f5e" stroke="#ffffff" stroke-width="1" />
+    <line x1="-5" y1="4" x2="5" y2="4" stroke="#ffffff" stroke-opacity="0.6" stroke-width="0.8" />
+    <line x1="-5" y1="8" x2="5" y2="8" stroke="#ffffff" stroke-opacity="0.6" stroke-width="0.8" />
+    <!-- Mic Stand U-neck -->
+    <path d="M -9 8 Q -9 18 0 18 Q 9 18 9 8" fill="none" stroke="#fda4af" stroke-width="1.5" />
+    <line x1="0" y1="18" x2="0" y2="26" stroke="#fda4af" stroke-width="2" />
+    <line x1="-7" y1="26" x2="7" y2="26" stroke="#fda4af" stroke-width="2" />
+    <!-- Glint spark -->
+    <circle cx="4" cy="2" r="1.5" fill="#ffffff" />
+  </g>
+
+  <!-- Event Headline: KARAOKE NIGHT -->
+  <text x="200" y="168" fill="url(#shelbyHeadlineGrad)" font-family="Impact, sans-serif" font-size="36" letter-spacing="2" text-anchor="middle" filter="url(#shelbyStageGlow)">KARAOKE</text>
+  <text x="200" y="200" fill="#ffffff" font-family="Impact, sans-serif" font-size="30" letter-spacing="3" text-anchor="middle">NIGHT</text>
+
+  <!-- Subtitle Tag -->
+  <text x="200" y="218" fill="#fda4af" font-family="sans-serif" font-weight="700" font-size="8" letter-spacing="3" text-anchor="middle">SING YOUR HEART OUT • LIVE STAGE VIBES</text>
+
+  <!-- =========================================================
+       STRICT ROLE SEPARATION (CRITICAL BLUEPRINT REQUIREMENT)
+       Card A: Stage Hosts (Bellah Harriet & Tito Wagithomo)
+       Card B: Sound & DJ (DJ Fab)
+       ========================================================= -->
+  <g transform="translate(36, 230)">
+    <!-- Container -->
+    <rect width="328" height="66" rx="10" fill="#1c050d" stroke="#e11d48" stroke-opacity="0.6" stroke-width="1.2" />
+
+    <!-- Left: Stage Hosts -->
+    <g transform="translate(12, 10)">
+      <rect width="65" height="14" rx="3" fill="#e11d48" fill-opacity="0.3" stroke="#fda4af" stroke-opacity="0.4" stroke-width="0.8" />
+      <text x="32.5" y="10" fill="#fda4af" font-family="sans-serif" font-weight="800" font-size="6.5" letter-spacing="1" text-anchor="middle">STAGE HOSTS</text>
+      <text x="2" y="30" fill="#ffffff" font-family="Impact, sans-serif" font-size="14" letter-spacing="0.5">BELLAH HARRIET</text>
+      <text x="2" y="44" fill="#fda4af" font-family="Impact, sans-serif" font-size="13" letter-spacing="0.5">&amp; TITO WAGITHOMO</text>
+    </g>
+
+    <!-- Center Divider Line -->
+    <line x1="190" y1="8" x2="190" y2="58" stroke="#e11d48" stroke-opacity="0.3" stroke-width="1" />
+
+    <!-- Right: DJ Curator -->
+    <g transform="translate(202, 10)">
+      <rect width="45" height="14" rx="3" fill="#8b5cf6" fill-opacity="0.3" stroke="#c4b5fd" stroke-opacity="0.4" stroke-width="0.8" />
+      <text x="22.5" y="10" fill="#c4b5fd" font-family="sans-serif" font-weight="800" font-size="6.5" letter-spacing="1" text-anchor="middle">ON DECKS</text>
+      <text x="2" y="32" fill="#ffffff" font-family="Impact, sans-serif" font-size="17" letter-spacing="0.8">DJ FAB</text>
+      <text x="2" y="45" fill="#c4b5fd" font-family="sans-serif" font-weight="700" font-size="7.5" letter-spacing="1">AUDIO &amp; SOUND</text>
+    </g>
+  </g>
+
+  <!-- =========================================================
+       UNMISTAKABLE SINGER OFFER QUALIFICATION
+       Primary: Free tequila shots for singers
+       Secondary: Discounts on gin, rum and vodka
+       ========================================================= -->
+
+  <!-- Primary Singer Perk Card (Unmistakable Condition) -->
+  <g transform="translate(36, 308)">
+    <rect width="328" height="68" rx="10" fill="#20040e" stroke="#eab308" stroke-width="1.8" />
+    
+    <!-- Left Golden Condition Ribbon -->
+    <path d="M 0 10 Q 0 0 10 0 L 36 0 L 36 68 L 10 68 Q 0 68 0 58 Z" fill="url(#shelbyGoldGrad)" />
+    <text x="18" y="38" fill="#120206" font-family="sans-serif" font-weight="900" font-size="14" text-anchor="middle">🎤</text>
+
+    <!-- Headline and Qualification -->
+    <text x="46" y="20" fill="#eab308" font-family="sans-serif" font-weight="900" font-size="7.5" letter-spacing="1.5">STAGE PERFORMER PRIVILEGE</text>
+    <text x="46" y="38" fill="#ffffff" font-family="Impact, sans-serif" font-size="16" letter-spacing="0.8">FREE TEQUILA SHOTS</text>
+    <text x="46" y="55" fill="#fef08a" font-family="sans-serif" font-weight="800" font-size="9" letter-spacing="1">FOR ALL KARAOKE SINGERS ON STAGE</text>
+
+    <!-- Star Pill Right -->
+    <rect x="255" y="16" width="60" height="36" rx="6" fill="#eab308" fill-opacity="0.15" stroke="#eab308" stroke-width="1" />
+    <text x="285" y="31" fill="#eab308" font-family="sans-serif" font-weight="900" font-size="7" text-anchor="middle">PERK</text>
+    <text x="285" y="44" fill="#ffffff" font-family="sans-serif" font-weight="900" font-size="9" text-anchor="middle">FREE</text>
+  </g>
+
+  <!-- Secondary Bar Discount Banner -->
+  <g transform="translate(36, 386)">
+    <rect width="328" height="42" rx="8" fill="#17030a" stroke="#e11d48" stroke-opacity="0.6" stroke-width="1.2" />
+    
+    <text x="14" y="17" fill="#f43f5e" font-family="sans-serif" font-weight="800" font-size="7" letter-spacing="1">BAR SPECIAL DISCOUNTS</text>
+    <text x="14" y="32" fill="#fff1f2" font-family="sans-serif" font-weight="700" font-size="9" letter-spacing="0.5">DISCOUNTS ON GIN, RUM &amp; VODKA BOTTLES</text>
+
+    <rect x="260" y="11" width="56" height="20" rx="10" fill="#e11d48" fill-opacity="0.25" stroke="#fda4af" stroke-opacity="0.5" stroke-width="0.8" />
+    <text x="288" y="24" fill="#fda4af" font-family="sans-serif" font-weight="800" font-size="7" text-anchor="middle">DISCOUNT</text>
+  </g>
+
+  <!-- Footer Operational Details -->
+  <g transform="translate(200, 456)">
+    <text x="0" y="0" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="9" letter-spacing="2" text-anchor="middle">OZONE LOUNGE NAIROBI</text>
+    <text x="0" y="12" fill="#fda4af" font-family="sans-serif" font-weight="600" font-size="7" letter-spacing="1.5" text-anchor="middle">EVERY THURSDAY • STAGE OPENS 7:00 PM • @OZONELOUNGE</text>
+  </g>
+</svg>

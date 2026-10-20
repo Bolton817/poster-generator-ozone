@@ -12,6 +12,7 @@ import { TemplateId, PosterDocument } from "../poster/schema";
 import { ReddingtonTemplate } from "@/components/poster/templates/ReddingtonTemplate";
 import { SaintTemplate } from "@/components/poster/templates/SaintTemplate";
 import { LannisterTemplate } from "@/components/poster/templates/LannisterTemplate";
+import { ShelbyTemplate } from "@/components/poster/templates/ShelbyTemplate";
 
 export type TemplateRendererComponent = React.ComponentType<{
   document: PosterDocument;
@@ -42,7 +43,7 @@ const TEMPLATE_RENDERERS: Record<TemplateId, TemplateRendererComponent> = {
   reddington: ReddingtonTemplate,
   saint: SaintTemplate,
   lannister: LannisterTemplate,
-  shelby: PlaceholderTemplateRenderer,
+  shelby: ShelbyTemplate,
   lothbrok: PlaceholderTemplateRenderer,
   escobar: PlaceholderTemplateRenderer,
   pinkman: PlaceholderTemplateRenderer,
