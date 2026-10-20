@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { ThemeToggle } from "@/features/theme/theme-context";
 import { Sparkles, User, LogOut, ChevronDown, Shield } from "lucide-react";
@@ -18,7 +17,6 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ user, title = "Ozone Lounge" }: AppHeaderProps) {
-  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

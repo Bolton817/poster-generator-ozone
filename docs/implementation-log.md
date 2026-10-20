@@ -239,7 +239,7 @@ Designed and built the mobile-first, responsive application shell and theme fram
 
 * **Date:** 18 October 2026
 * **Status:** Complete (Gate G2 Passed)
-* **Git Commit / Branch:** Pending Stage 05 commit (master)
+* **Git Commit / Branch:** `f689ea1` (master)
 
 ### 1. Summary of Changes
 Defined the canonical, serializable TypeScript contract and Zod runtime schema (`src/features/poster/schema.ts`) for `PosterDocument` (`schemaVersion: 1`, `templateVersion: 1`, fixed canvas `1080×1350`, event content, asset IDs, styling tokens, and normalized focal points). Established the single-source-of-truth Template Registry (`src/features/templates/registry.ts`) registering all 7 weekly templates in exact Monday-to-Sunday order (`reddington`, `saint`, `lannister`, `shelby`, `lothbrok`, `escobar`, `pinkman`) with verbatim event copy, lineups, source offers, curated palette presets, and default document factories. Preserved Friday's empty offer as valid empty string (zero placeholder text). Refactored template gallery overview (`src/app/app/templates/page.tsx`) to consume the registry directly. Developed and executed automated regression test suite (`scripts/test-registry.ts`) asserting 100% contract compliance, input rejection, and template extensibility.
@@ -277,5 +277,79 @@ Defined the canonical, serializable TypeScript contract and Zod runtime schema (
 * NO visual canvas renderers or editor controls built yet (scheduled for Stages 06–09).
 * Preserved working auth, database, shell, and theme foundations.
 
+---
+
+## Stage 06: Premium Fonts and Image Asset Infrastructure
+
+* **Date:** 20 October 2026
+* **Status:** Complete (Gate G3 Passed)
+* **Git Commit / Branch:** Pending Stage 06 commit (master)
+
+### 1. Summary of Changes
+Established font registration and durable image storage infrastructure in strict compliance with TDD Stage 06:
+1. **Font Catalogue & Dynamic Registration Engine**:
+   - Built font registry manifest (`src/features/fonts/manifest.ts`) and TypeScript types (`src/features/fonts/types.ts`).
+   - Downloaded and verified sample SIL Open Font License fonts in `public/fonts/`: `Inter-Variable.ttf` (TTF), `SourceSans3-Bold.otf` (OTF), and `BebasNeue-Regular.ttf` (TTF).
+   - Authored font loader utility (`src/features/fonts/font-loader.ts`) supporting dynamic `@font-face` generation and browser `document.fonts.ready` readiness detection prior to export.
+   - Documented full typography catalogue in `docs/font-inventory.md`.
+2. **Image Slot Policy & Media Validation**:
+   - Specified image slot policies in `docs/asset-policy.md` and enforced in `src/features/assets/slot-policy.ts` across `heroBackground`, `logo`, `secondaryImage`, and `texture`.
+   - Constrained allowable raster types strictly to `image/jpeg`, `image/png`, and `image/webp` with a 10MB maximum limit. Untrusted SVGs rejected on upload.
+   - Built client-side hook `src/features/assets/use-image-upload.ts` managing instant ephemeral `URL.createObjectURL(file)` preview with automatic `URL.revokeObjectURL()` cleanup, guaranteeing drafts never serialize `blob:` URLs.
+3. **Storage Service Adapter & Server Upload Route**:
+   - Created provider abstraction `StorageService` (`src/lib/storage/types.ts`) and local filesystem provider `LocalFileStorageService` (`src/lib/storage/local-storage.ts`), storing binaries in `public/uploads/` with secure UUID filenames.
+   - Added provider factory in `src/lib/storage/index.ts` selecting `local` by default.
+   - Built protected server API route `/api/assets/upload` (`src/app/api/assets/upload/route.ts`) enforcing `requireAuth()`, validating MIME types/size, decoding width & height using `image-size`, writing to storage, and persisting records in PostgreSQL `media_assets` table.
+4. **Automated Verification Test Suite**:
+   - Created `scripts/test-fonts-and-assets.ts` exercising all 5 verification suites.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `docs/font-inventory.md`: Complete register of font families, formats, weights, and license notes.
+  * `docs/asset-policy.md`: Image slot specifications, upload constraints, and persistence lifecycle rules.
+  * `public/fonts/Inter-Variable.ttf`: Verified TTF font file.
+  * `public/fonts/SourceSans3-Bold.otf`: Verified OTF font file.
+  * `public/fonts/BebasNeue-Regular.ttf`: Verified display TTF font file.
+  * `src/features/fonts/types.ts`: TypeScript contracts for fonts and typography presets.
+  * `src/features/fonts/manifest.ts`: Authoritative font registry and preset mappings.
+  * `src/features/fonts/font-loader.ts`: Dynamic `@font-face` generation and `document.fonts.ready` detection.
+  * `src/features/assets/types.ts`: Types for image slots, media assets, and preview state.
+  * `src/features/assets/slot-policy.ts`: Validation rules and image slot limits.
+  * `src/features/assets/use-image-upload.ts`: Client upload hook with automatic blob revocation.
+  * `src/lib/storage/types.ts`: `StorageService` provider interface.
+  * `src/lib/storage/local-storage.ts`: Local filesystem storage adapter.
+  * `src/lib/storage/index.ts`: Storage service factory singleton.
+  * `src/app/api/assets/upload/route.ts`: Authenticated upload API route with dimension decoding.
+  * `scripts/test-fonts-and-assets.ts`: Comprehensive 5-suite automated test.
+* **Changed**:
+  * `package.json` & `package-lock.json`: Added `image-size`.
+  * `src/components/auth/LoginForm.tsx`: Cleaned unused router reference.
+  * `src/components/app-shell/AppHeader.tsx`: Cleaned unused router reference.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npm install image-size`: Installed v1.2.0 (PASS).
+* `cmd /c npx tsx scripts/test-fonts-and-assets.ts`: 5/5 test suites passed (font catalogue, @font-face CSS, slot policies, storage adapter, authenticated upload API, 401/413/415 error codes, PostgreSQL persistence) (PASS).
+* `cmd /c npx tsc --noEmit`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Compiled 10 routes cleanly in 18.0s (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: All 5 registry test suites passed (PASS).
+* `cmd /c npx tsx scripts/test-shell.ts`: All 3 workspace routes passed on production build (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **TTF/OTF fonts render with the expected selected weights in the live canvas** | **PASS** | Verified in `scripts/test-fonts-and-assets.ts` Suite 1 & 2 (`Inter-Variable.ttf`, `SourceSans3-Bold.otf`, `BebasNeue-Regular.ttf`). |
+| **Images preview immediately, reject unsafe/oversized files with understandable errors and survive save through durable URLs** | **PASS** | Verified in Suite 3 & 5. 11MB file rejected with 413, text/plain rejected with 415, valid upload returned durable `/uploads/...` URL and persisted to `media_assets`. |
+| **Temporary object URLs are cleaned up and never assumed valid after reload** | **PASS** | `use-image-upload.ts` explicitly revokes object URLs via `URL.revokeObjectURL()` on replacement/unmount and never returns `blob:` as durable URL. |
+| **Font or asset failure falls back gracefully and is visible to the operator** | **PASS** | `font-loader.ts` checks availability and falls back to system sans-serif with warning; API returns structured `ServiceResult` errors. |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY font catalogue, loader, image slot policy, and storage adapter infrastructure.
+* NO visual canvas renderers or editor controls designed yet (scheduled for Stage 07 & 09).
+* Preserved working auth, database, shell, and registry foundations.
+
 ### 6. Recommended Next Stage
-**Stage 06 — Premium fonts and image asset infrastructure** (TTF/OTF font registry, font loading/readiness detection, and durable asset storage/upload adapter).
+**Stage 07 — Fixed poster canvas, responsive scaling and export proof of concept** (1080×1350 fixed coordinate canvas, two-tier `ResizeObserver` scale wrapper, and isolated DOM-to-canvas/image rasterization POC).
+
