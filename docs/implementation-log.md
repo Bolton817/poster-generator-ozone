@@ -579,5 +579,85 @@ Delivered the complete vertical slice for **Monday: Reddington (Old Classics & S
 ### 6. Recommended Next Stage
 **Stage 10 — Full-Screen Poster Preview and Touch Zoom** (deliver dedicated full-screen modal preview, mobile touch/pinch zoom, double-tap 100% inspection, and pre-export checklist).
 
+---
+
+## Stage 10: Full-Screen Poster Preview and Touch Zoom
+
+* **Date:** 20 October 2026
+* **Status:** Complete (Gate G3/G4 Passed)
+* **Git Commit / Branch:** master
+
+### 1. Summary of Changes
+Designed, engineered, and verified the complete **Full-Screen Poster Preview and Touch Zoom** interaction mode per TDD Stage 10 (pp. 78–79), Blueprint Section 5.3 & Section 14.3, and Invariant 11.4:
+1. **Gesture Engine & Zoom Hook (`src/features/preview/use-poster-zoom.ts`)**:
+   - Implemented `usePosterZoom` managing responsive container measurements, pure uniform fit scaling, touch pinch-to-zoom (2 pointers via `pointerId`), single-finger and mouse drag panning, wheel zooming, and double-tap / double-click state toggling between `Fit` and `100%` physical pixel inspection (`effectiveScale = 1.0`).
+   - Boundary-clamped panning: strictly restricts pan offset within calculated overflow boundaries (`[-maxPanX, maxPanX]`, `[-maxPanY, maxPanY]`), locking to `(0, 0)` when at or below `Fit` scale.
+   - Display transform isolation invariant (Invariant 11.4): zoom/pan mutations are strictly local UI state; they never touch `PosterDocument`, never trigger `isDirty`, and never alter master 1080 × 1350 px export dimensions.
+2. **Pre-Export Inspection Checklist (`src/features/preview/checklist.ts` & `src/components/preview/PreExportChecklist.tsx`)**:
+   - Authored pure draft validator evaluating essential event parameters (Title, Lineup, Offer, Date, Start Time, Venue).
+   - Validated non-blocking advisory warnings for missing event date and start times per Decision 04 without obstructing master export.
+   - Encoded Flight Fridays offer-free exemption policy per Decision 06 and Reddington wine exclusion qualification.
+   - Built accessible checklist modal dialog.
+3. **Floating Accessible Zoom Controls (`src/components/preview/ZoomControls.tsx`)**:
+   - Engineered floating toolbar with 44px touch targets: Zoom Out (`−`), interactive percentage display (e.g. `Fit (42%)`, `100%`, `150%`), Zoom In (`+`), `Fit` reset button, and `100%` inspection toggle.
+4. **Full-Screen Overlay Modal (`src/components/preview/FullScreenPreviewModal.tsx`)**:
+   - Fixed full-screen modal (`fixed inset-0 z-50 bg-slate-950 text-slate-100 select-none`) with dark neutral backdrop.
+   - Header with accessible close button (`✕`), keyboard `Escape` listener, template badge, and checklist status badge.
+   - Transform stage wrapping the unscaled 1080 × 1350 px composition node with GPU-accelerated `translate3d(panX, panY, 0) scale(effectiveScale)`.
+   - Direct one-click master export triggers for **Download PNG** and **Download JPEG** with in-modal loading and status feedback toasts.
+5. **Editor Integration (`src/components/editor/PosterEditor.tsx`)**:
+   - Added Full Screen Preview action button with `Maximize2` icon in toolbar.
+   - Added quick full-screen expand button and click handler on the live canvas viewport.
+   - Mounted `FullScreenPreviewModal` with clean composition root reference for artifact-free export.
+6. **Automated Verification Suite (`scripts/test-preview-and-zoom.ts`)**:
+   - Authored 22-test automated CLI test suite covering fit scale math, iPhone/desktop scaling, pan boundary clamping, double-tap toggle transitions, checklist validation, and Invariant 11.4 display transform isolation.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `src/features/preview/types.ts`: TypeScript contracts for zoom state, checklist items, and evaluations.
+  * `src/features/preview/use-poster-zoom.ts`: Custom hook for pinch, drag pan, wheel, double-tap, and keyboard zoom.
+  * `src/features/preview/checklist.ts`: Pure pre-export draft evaluation validator.
+  * `src/components/preview/ZoomControls.tsx`: Accessible floating zoom toolbar component.
+  * `src/components/preview/PreExportChecklist.tsx`: Pre-flight checklist modal dialog.
+  * `src/components/preview/FullScreenPreviewModal.tsx`: Complete full-screen modal preview overlay.
+  * `scripts/test-preview-and-zoom.ts`: 22-test automated CLI test suite.
+* **Changed**:
+  * `src/components/editor/PosterEditor.tsx`: Added preview triggers in toolbar and viewport, wired modal.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npx tsx scripts/test-preview-and-zoom.ts`: 22/22 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-reddington-vertical-slice.ts`: 20/20 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-editor-framework.ts`: 31/31 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-canvas-export.ts`: 19/19 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 tests passed (PASS).
+* `cmd /c npm run type-check`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Compiled 18 routes cleanly in 8.0s (PASS).
+* `node -e "fetch('http://localhost:3005/api/health')..."`: Returned HTTP 200 OK (PASS).
+* `node -e "fetch('http://localhost:3005/app/templates/reddington' with session cookie)..."`: Returned HTTP 200 OK with Preview button (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Phone-first full-screen preview with zoom gestures and obvious close control** | **PASS** | `FullScreenPreviewModal` renders with `X` button, `Escape` key listener, and pinch/drag touch gestures. |
+| **Poster centered with object-contain fitting; no cropping at Fit** | **PASS** | Verified in `scripts/test-preview-and-zoom.ts` Suite 1 on narrow iPhone (390×844) and desktop (1920×1080). |
+| **Pinch-to-zoom on touch screens; one-finger pan when zoomed beyond Fit** | **PASS** | Verified in `use-poster-zoom.ts` multi-touch pointer tracking and boundary-clamped pan math. |
+| **Visible +, −, Fit and 100% controls as accessible alternatives to gestures** | **PASS** | `ZoomControls.tsx` provides 44px accessible touch targets and percentage display. |
+| **Double-tap toggles between Fit and 100% inspection** | **PASS** | Verified in Suite 3: transitions reliably between Fit and 1:1 pixel inspection. |
+| **Preview gestures never change actual poster design scale or export dimensions** | **PASS** | Verified in Suite 5: Invariant 11.4 verified; `PosterDocument` data remains immutable during zoom/pan. |
+| **Pre-export checklist evaluates draft with non-blocking advisory notices** | **PASS** | Verified in Suite 4: missing date/time flagged as advisory warnings per Decision 04 without blocking export. |
+| **One-click master export available directly inside preview** | **PASS** | `FullScreenPreviewModal.tsx` provides Export PNG and JPEG buttons with status toasts. |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Full-Screen Preview, Touch Zoom, Pre-Export Checklist, and Preview Export triggers.
+* Did NOT implement draft database saving or persistence API endpoints (scheduled for Stage 11).
+* Did NOT implement batch weekly export or zip bundling (scheduled for Stage 12).
+* Preserved working auth, database, shell, registry, fonts, and Reddington vertical slice foundations.
+
+### 6. Recommended Next Stage
+**Stage 11 — Draft Persistence, Auto-Save, and Draft Management Workspace** (Supabase draft autosave, list/load/delete drafts workspace, offline retry).
+
 
 

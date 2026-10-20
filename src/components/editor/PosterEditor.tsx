@@ -16,6 +16,7 @@ import {
 import { injectFontFace, waitForFontsReady } from "@/features/fonts/font-loader";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
+import { FullScreenPreviewModal } from "@/components/preview/FullScreenPreviewModal";
 import {
   ArrowLeft,
   RotateCcw,
@@ -25,6 +26,7 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle2,
+  Maximize2,
 } from "lucide-react";
 
 export function PosterEditor() {
@@ -45,6 +47,9 @@ export function PosterEditor() {
   // Confirmation dialogs
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+
+  // Full-screen modal preview state (Stage 10)
+  const [showFullscreenPreview, setShowFullscreenPreview] = useState(false);
 
   // Preload and inject template fonts on mount
   useEffect(() => {
@@ -194,6 +199,19 @@ export function PosterEditor() {
             <span className="hidden sm:inline">Reset</span>
           </Button>
 
+          {/* Full Screen Preview Button */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFullscreenPreview(true)}
+            aria-label="Open full-screen preview"
+            className="text-xs flex items-center gap-1.5 border-slate-700/80 bg-slate-800/60 hover:bg-slate-700 text-slate-200"
+          >
+            <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Preview</span>
+          </Button>
+
           {/* Export Action Buttons */}
           <div className="flex items-center gap-1 bg-slate-950 p-0.5 rounded-lg border border-slate-800">
             <Button
@@ -267,11 +285,28 @@ export function PosterEditor() {
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Left / Mobile Preview Viewport */}
         <div
-          className={`flex-1 flex items-center justify-center p-4 bg-slate-950 overflow-hidden ${
+          className={`flex-1 flex flex-col items-center justify-center p-4 bg-slate-950 overflow-hidden relative ${
             mobileTab === "preview" ? "flex" : "hidden lg:flex"
           }`}
         >
-          <div className="w-full h-full max-w-2xl max-h-[95%] flex items-center justify-center">
+          {/* Quick expand to full-screen button */}
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              type="button"
+              onClick={() => setShowFullscreenPreview(true)}
+              aria-label="Open full-screen preview"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-800/80 backdrop-blur-md shadow-lg transition-colors"
+            >
+              <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+              <span>Full Screen</span>
+            </button>
+          </div>
+
+          <div
+            onClick={() => setShowFullscreenPreview(true)}
+            className="w-full h-full max-w-2xl max-h-[95%] flex items-center justify-center cursor-pointer group"
+            title="Click to open full-screen preview"
+          >
             <CanvasViewport showBadge={true} padding={16}>
               <PosterCanvas ref={canvasRef}>
                 <Renderer document={document} />
@@ -361,6 +396,18 @@ export function PosterEditor() {
           </Button>
         </div>
       </Dialog>
+
+      {/* Full-Screen Preview Modal (Stage 10) */}
+      <FullScreenPreviewModal
+        isOpen={showFullscreenPreview}
+        onClose={() => setShowFullscreenPreview(false)}
+        document={document}
+        template={template}
+        onExport={handleExport}
+        isExporting={isExporting}
+        exportSuccessMsg={exportSuccessMsg}
+        exportError={exportError}
+      />
     </div>
   );
 }
