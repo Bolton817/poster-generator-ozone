@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEditor } from "@/features/editor/editor-context";
 import { EditorSectionList } from "./EditorSectionList";
 import { CanvasViewport } from "@/features/canvas/CanvasViewport";
 import { PosterCanvas } from "@/features/canvas/PosterCanvas";
+import { getTemplateRenderer } from "@/features/templates/renderers";
+import { posterExporter } from "@/features/export/exporter-adapter";
+import {
+  triggerBlobDownload,
+  generatePosterFileName,
+} from "@/features/export/export-utils";
+import { injectFontFace, waitForFontsReady } from "@/features/fonts/font-loader";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import {
@@ -14,7 +21,8 @@ import {
   RotateCcw,
   Eye,
   SlidersHorizontal,
-  Sparkles,
+  Download,
+  RefreshCw,
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
@@ -24,17 +32,30 @@ export function PosterEditor() {
   const { state, template, resetToDefaults } = useEditor();
   const { document, isDirty, warnings } = state;
 
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+
   // Mobile tab state: "controls" or "preview"
   const [mobileTab, setMobileTab] = useState<"controls" | "preview">("controls");
+
+  // Export state
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [exportSuccessMsg, setExportSuccessMsg] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   // Confirmation dialogs
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
-  // Active palette tokens for live preview
-  const activePalette =
-    template.palettePresets.find((p) => p.id === document.styling.paletteId) ||
-    template.palettePresets[0];
+  // Preload and inject template fonts on mount
+  useEffect(() => {
+    injectFontFace("bebas-neue");
+    injectFontFace("source-sans-3");
+    injectFontFace("inter");
+    waitForFontsReady(["bebas-neue", "source-sans-3", "inter"]);
+  }, []);
+
+  // Dynamically resolve template renderer component
+  const Renderer = getTemplateRenderer(template.id);
 
   const handleBackClick = (e: React.MouseEvent) => {
     if (isDirty) {
@@ -51,6 +72,43 @@ export function PosterEditor() {
   const handleConfirmReset = () => {
     resetToDefaults();
     setShowResetDialog(false);
+  };
+
+  const handleExport = async (format: "png" | "jpeg") => {
+    if (!canvasRef.current || isExporting) return;
+
+    setIsExporting(true);
+    setExportError(null);
+    setExportSuccessMsg(null);
+
+    try {
+      const fileName = generatePosterFileName({
+        day: template.dayLabel,
+        templateName: template.name,
+        eventTitle: document.content.eventTitle || "Event",
+        format,
+      });
+
+      const result = await posterExporter.rasterize(canvasRef.current, {
+        format,
+        quality: 0.95,
+        fileName,
+      });
+
+      triggerBlobDownload(result.blob, result.fileName);
+      setExportSuccessMsg(
+        `Exported ${format.toUpperCase()} (${result.width}×${result.height}px, ${(result.byteSize / 1024).toFixed(1)} KB)`
+      );
+
+      // Auto-clear success message after 4 seconds
+      setTimeout(() => setExportSuccessMsg(null), 4000);
+    } catch (err: unknown) {
+      console.error("[PosterEditor] Export error:", err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setExportError(msg);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -136,19 +194,74 @@ export function PosterEditor() {
             <span className="hidden sm:inline">Reset</span>
           </Button>
 
-          {/* Diagnostic POC Link */}
-          <Link href="/diagnostic/canvas-poc" target="_blank">
+          {/* Export Action Buttons */}
+          <div className="flex items-center gap-1 bg-slate-950 p-0.5 rounded-lg border border-slate-800">
             <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              disabled={isExporting}
+              onClick={() => handleExport("png")}
+              className="text-xs flex items-center gap-1.5"
+            >
+              {isExporting ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span className="hidden sm:inline">Exporting...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>PNG</span>
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
               variant="outline"
               size="sm"
-              className="text-xs border-amber-500/40 text-amber-300 hover:bg-amber-500/10 flex items-center gap-1"
+              disabled={isExporting}
+              onClick={() => handleExport("jpeg")}
+              className="text-xs hidden sm:flex items-center gap-1 border-slate-800 text-slate-300 hover:text-white"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export POC</span>
+              <span>JPEG</span>
             </Button>
-          </Link>
+          </div>
         </div>
       </header>
+
+      {/* Export Feedback Toasts / Banners */}
+      {exportSuccessMsg && (
+        <div className="bg-emerald-950/80 border-b border-emerald-800/80 px-4 py-2 text-xs text-emerald-300 flex items-center justify-between animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{exportSuccessMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setExportSuccessMsg(null)}
+            className="text-emerald-400 hover:text-emerald-200 text-xs font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {exportError && (
+        <div className="bg-rose-950/80 border-b border-rose-800/80 px-4 py-2 text-xs text-rose-300 flex items-center justify-between animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{exportError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setExportError(null)}
+            className="text-rose-400 hover:text-rose-200 text-xs font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Main Workspace Layout */}
       <div className="flex-1 flex overflow-hidden">
@@ -160,216 +273,8 @@ export function PosterEditor() {
         >
           <div className="w-full h-full max-w-2xl max-h-[95%] flex items-center justify-center">
             <CanvasViewport showBadge={true} padding={16}>
-              <PosterCanvas>
-                {/* Live Responsive Render of Current Document State */}
-                <div
-                  className="w-full h-full relative flex flex-col justify-between p-16 select-none"
-                  style={{
-                    backgroundColor: activePalette?.background || "#120a02",
-                    color: activePalette?.text || "#ffffff",
-                  }}
-                >
-                  {/* Decorative background glow using active palette tokens */}
-                  <div
-                    className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
-                    style={{
-                      background: `radial-gradient(circle, ${activePalette?.primary || "#f59e0b"}40 0%, transparent 70%)`,
-                      filter: "blur(50px)",
-                    }}
-                  />
-
-                  {/* Header / Brand */}
-                  <div
-                    className="relative z-10 flex items-center justify-between pb-8"
-                    style={{ borderBottom: `1px solid ${activePalette?.primary || "#f59e0b"}30` }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className="w-16 h-16 rounded-xl flex items-center justify-center font-bold text-2xl tracking-tighter"
-                        style={{
-                          backgroundColor: `${activePalette?.primary || "#f59e0b"}20`,
-                          border: `1px solid ${activePalette?.primary || "#f59e0b"}50`,
-                          color: activePalette?.primary || "#f59e0b",
-                        }}
-                      >
-                        OZ
-                      </div>
-                      <div>
-                        <span
-                          style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                          className="text-4xl tracking-wider block"
-                          style-color={activePalette?.primary}
-                        >
-                          {document.content.venueName || "OZONE LOUNGE"}
-                        </span>
-                        <span
-                          style={{ fontFamily: "'Source Sans 3', sans-serif" }}
-                          className="text-sm font-semibold tracking-widest uppercase opacity-75"
-                        >
-                          {template.tag}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <span
-                        style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                        className="text-3xl tracking-wider block"
-                      >
-                        {template.dayLabel.toUpperCase()}
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: "'Source Sans 3', sans-serif",
-                          color: activePalette?.accent || "#fbbf24",
-                        }}
-                        className="text-sm font-bold tracking-wider uppercase"
-                      >
-                        {template.name}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Body / Lineup / Headline */}
-                  <div className="relative z-10 my-auto text-center flex flex-col items-center">
-                    <div
-                      className="inline-block px-6 py-2 rounded-full text-sm font-bold tracking-widest uppercase mb-6"
-                      style={{
-                        backgroundColor: `${activePalette?.primary || "#f59e0b"}15`,
-                        border: `1px solid ${activePalette?.primary || "#f59e0b"}40`,
-                        color: activePalette?.primary || "#f59e0b",
-                      }}
-                    >
-                      {template.dayLabel} Session
-                    </div>
-
-                    <h1
-                      style={{
-                        fontFamily: "'Bebas Neue', sans-serif",
-                        fontSize: "92px",
-                        lineHeight: "0.95",
-                        letterSpacing: "0.03em",
-                        color: activePalette?.primary || "#f59e0b",
-                      }}
-                      className="drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] mb-6 max-w-[900px]"
-                    >
-                      {document.content.eventTitle || "UNTITLED EVENT"}
-                    </h1>
-
-                    {/* Lineup Block */}
-                    {(document.content.djNames.length > 0 || document.content.hostNames.length > 0) && (
-                      <div className="flex flex-col items-center gap-3 mt-4">
-                        {document.content.djNames.length > 0 && (
-                          <div className="text-center">
-                            <span
-                              style={{ fontFamily: "'Source Sans 3', sans-serif" }}
-                              className="text-xs font-bold uppercase tracking-widest opacity-70 block mb-0.5"
-                            >
-                              Featured DJs
-                            </span>
-                            <span
-                              style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-                              className="text-4xl tracking-wide"
-                            >
-                              {document.content.djNames.join(" & ")}
-                            </span>
-                          </div>
-                        )}
-
-                        {document.content.hostNames.length > 0 && (
-                          <div className="text-center mt-1">
-                            <span
-                              style={{ fontFamily: "'Source Sans 3', sans-serif" }}
-                              className="text-xs font-bold uppercase tracking-widest opacity-70 block mb-0.5"
-                            >
-                              Hosted By
-                            </span>
-                            <span
-                              style={{ fontFamily: "'Inter', sans-serif" }}
-                              className="text-lg font-medium opacity-90"
-                            >
-                              {document.content.hostNames.join(" & ")}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Offer Panel (Omitted cleanly if empty) */}
-                    {(document.content.primaryOffer || document.content.secondaryOffer) && (
-                      <div
-                        className="mt-10 w-full max-w-[760px] p-7 rounded-2xl shadow-2xl backdrop-blur-md"
-                        style={{
-                          backgroundColor: "rgba(10, 10, 12, 0.85)",
-                          border: `1px solid ${activePalette?.primary || "#f59e0b"}40`,
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="text-left">
-                            <span
-                              style={{
-                                fontFamily: "'Source Sans 3', sans-serif",
-                                color: activePalette?.accent || "#fbbf24",
-                              }}
-                              className="text-xs font-bold uppercase tracking-wider block"
-                            >
-                              Special Offer
-                            </span>
-                            <span
-                              style={{ fontFamily: "'Inter', sans-serif" }}
-                              className="text-2xl font-semibold text-slate-100 block mt-1"
-                            >
-                              {document.content.primaryOffer}
-                            </span>
-                          </div>
-                          {document.content.secondaryOffer && (
-                            <div
-                              className="px-4 py-2 rounded-lg"
-                              style={{
-                                backgroundColor: `${activePalette?.primary || "#f59e0b"}20`,
-                                border: `1px solid ${activePalette?.primary || "#f59e0b"}40`,
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontFamily: "'Inter', sans-serif",
-                                  color: activePalette?.secondary || "#fdba74",
-                                }}
-                                className="text-xs font-bold uppercase tracking-widest"
-                              >
-                                {document.content.secondaryOffer}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Footer / Practical Details */}
-                  <div
-                    className="relative z-10 flex items-center justify-between pt-8 text-xs opacity-75"
-                    style={{ borderTop: `1px solid ${activePalette?.primary || "#f59e0b"}30` }}
-                  >
-                    <div style={{ fontFamily: "'Inter', sans-serif" }}>
-                      {document.content.dateText || "Date TBD"}
-                      {document.content.startTime && ` · ${document.content.startTime}`}
-                    </div>
-                    <div style={{ fontFamily: "'Inter', sans-serif" }}>
-                      {document.content.locationText || "Ozone Lounge"}
-                      {document.content.socialHandle && ` · ${document.content.socialHandle}`}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'Source Sans 3', sans-serif",
-                        color: activePalette?.accent || "#fbbf24",
-                      }}
-                      className="tracking-widest uppercase font-semibold"
-                    >
-                      1080 × 1350
-                    </div>
-                  </div>
-                </div>
+              <PosterCanvas ref={canvasRef}>
+                <Renderer document={document} />
               </PosterCanvas>
             </CanvasViewport>
           </div>

@@ -41,6 +41,7 @@ export interface TemplateDefinition {
   typographyPresets: TypographyPreset[];
   layoutOptions: LayoutOption[];
   supportedImageSlots: Array<"background" | "performer" | "texture">;
+  thumbnailUrl?: string;
   defaults: PosterDocument;
 }
 
@@ -113,6 +114,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     tag: "Best for Monday Sundowners",
     description: "Retro classics, sunset colours and vintage music aesthetics.",
     templateVersion: 1,
+    thumbnailUrl: "/template-thumbnails/reddington.svg",
     palettePresets: [
       {
         id: "sunset-ember",

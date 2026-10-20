@@ -504,5 +504,80 @@ Established font registration and durable image storage infrastructure in strict
 ### 6. Recommended Next Stage
 **Stage 09 — Reddington end-to-end vertical slice** (complete Monday Reddington retro/sunset template composition, live preview rendering, export fixture, and end-to-end workflow).
 
+---
+
+## Stage 09: Reddington End-to-End Vertical Slice
+
+* **Date:** 20 October 2026
+* **Status:** Complete (Gate G3/G4 Slice Passed)
+* **Git Commit / Branch:** master
+
+### 1. Summary of Changes
+Delivered the complete vertical slice for **Monday: Reddington (Old Classics & Sundowners)** per TDD Section III (p. 48) and Stage 09 specifications (pp. 76–77):
+1. **Representative Vector Thumbnail (`public/template-thumbnails/reddington.svg`)**:
+   - Crafted a crisp 1080×1350 vector thumbnail illustrating Monday's retro sunset discs, concentric vinyl grooves, typography hierarchy, Monsieur Pierre lineup badge, and promotional ticket card.
+2. **Dedicated Monday Reddington Composition (`src/components/poster/templates/ReddingtonTemplate.tsx`)**:
+   - Master fixed dimensions: exact 1080 × 1350 px layout (`4:5` aspect ratio).
+   - Atmospheric warm retro sunset aesthetic supporting three curated palettes: *Sunset Ember*, *Golden Hour*, and *Vinyl Noir*.
+   - Concentric vinyl grooves and warm sun-disc glow layers.
+   - Text wrapping for event title (`OLD CLASSICS & SUNDOWNERS`) using high-impact display font (`Bebas Neue`).
+   - Lineup panel separating Selector/DJ (`Monsieur Pierre`) and guest host roles.
+   - High-contrast ticket promotional offer card featuring an unmistakable, high-contrast qualification badge for `"Excluding wine"`.
+   - Layout rebalancing logic that gracefully expands atmospheric spacing when offers or performers are omitted.
+   - Missing image fallback that applies warm radial gradient backdrops without broken image icons or missing asset placeholders.
+   - Practical logistics footer safely rendering venue, time, and social handles without fabricating unverified details.
+3. **Template Renderer Resolution (`src/features/templates/renderers.tsx`)**:
+   - Created extensible registry resolver dynamically mapping template IDs to their React composition components (`getTemplateRenderer('reddington')` -> `ReddingtonTemplate`).
+4. **Editor Integration & One-Click Master Export (`src/components/editor/PosterEditor.tsx`)**:
+   - Updated editor workspace to render dynamic template compositions inside `CanvasViewport` and `PosterCanvas`.
+   - Wired toolbar master export triggers for instant 1080 × 1350 PNG and JPEG generation with sanitized filename generation (`reddington-old-classics-sundowners-1080x1350.png`).
+   - Updated template catalog gallery (`src/app/app/templates/page.tsx`) to display template vector thumbnail.
+5. **Comprehensive Automated Verification (`scripts/test-reddington-vertical-slice.ts`)**:
+   - Authored 20-test automated verification suite covering verbatim source copy integrity, dynamic renderer resolution, multi-performer lineup scalability, no-image fallbacks, offer-free layout rebalancing, palette token conformance, and binary PNG master 1080×1350 header decoding.
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * `public/template-thumbnails/reddington.svg`: Vector thumbnail asset for Monday Reddington.
+  * `src/components/poster/templates/ReddingtonTemplate.tsx`: Dedicated Monday retro/sunset poster template component.
+  * `src/features/templates/renderers.tsx`: Extensible template renderer registry.
+  * `scripts/test-reddington-vertical-slice.ts`: 20-test automated verification suite for Stage 09.
+* **Changed**:
+  * `src/features/templates/registry.ts`: Added `thumbnailUrl` to Reddington definition.
+  * `src/app/app/templates/page.tsx`: Displayed template thumbnails in the template gallery.
+  * `src/components/editor/PosterEditor.tsx`: Connected `getTemplateRenderer` and export actions.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npx tsx scripts/test-reddington-vertical-slice.ts`: 20/20 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-editor-framework.ts`: 31/31 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-canvas-export.ts`: 19/19 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 tests passed (PASS).
+* `cmd /c npm run type-check`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: Compiled 18 routes cleanly in 10.1s (all 7 template SSG paths rendered) (PASS).
+* `node -e "fetch('http://localhost:3005/api/health')..."`: Returned HTTP 200 OK with canvas metadata (PASS).
+* `node -e "fetch('http://localhost:3005/app/templates/reddington')..."`: Returned HTTP 307 Redirect to `/login` when unauthenticated (PASS).
+* `node -e "fetch('http://localhost:3005/app/templates/reddington' with session cookie)..."`: Returned HTTP 200 OK with Reddington markup (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Monday Reddington renders with verbatim source copy and Monsieur Pierre** | **PASS** | Verified in `scripts/test-reddington-vertical-slice.ts` Suite 1. |
+| **"Excluding wine" qualification is prominently visible and unmistakable** | **PASS** | High-contrast qualification badge rendered in `ReddingtonTemplate.tsx` with dynamic parsing from source copy. |
+| **Live canvas viewport renders the full Reddington composition at 1080×1350** | **PASS** | Verified in `src/components/editor/PosterEditor.tsx` via `getTemplateRenderer('reddington')`. |
+| **One-click export produces sanitized 1080×1350 PNG and JPEG master files** | **PASS** | Verified in `PosterEditor.tsx` toolbar action and binary header tests in Suite 7. |
+| **Missing images and blank offers rebalance layout without broken placeholders** | **PASS** | Verified in Suite 4 and Suite 5. Radial gradients fill canvas cleanly. |
+| **Gallery displays representative thumbnail** | **PASS** | `public/template-thumbnails/reddington.svg` rendered in `/app/templates`. |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Monday Reddington template composition and its vertical slice.
+* Did NOT implement templates 2–7 (Saint, Lannister, Shelby, Lothbrok, Escobar, Pinkman); reserved for Stages 13–18.
+* Did NOT implement full-screen pinch zoom or touch gestures (reserved for Stage 10).
+* Preserved all working auth, database, app shell, font, and editor foundations.
+
+### 6. Recommended Next Stage
+**Stage 10 — Full-Screen Poster Preview and Touch Zoom** (deliver dedicated full-screen modal preview, mobile touch/pinch zoom, double-tap 100% inspection, and pre-export checklist).
+
 
 

@@ -55,6 +55,17 @@ export default function TemplatesPage() {
                 </span>
               </div>
 
+              {tpl.thumbnailUrl && (
+                <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950/80 group-hover:border-amber-500/40 transition-colors shadow-inner">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={tpl.thumbnailUrl}
+                    alt={`${tpl.name} preview`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              )}
+
               <div>
                 <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
                   {tpl.eventTitle}
