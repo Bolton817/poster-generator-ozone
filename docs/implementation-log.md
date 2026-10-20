@@ -353,3 +353,74 @@ Established font registration and durable image storage infrastructure in strict
 ### 6. Recommended Next Stage
 **Stage 07 — Fixed poster canvas, responsive scaling and export proof of concept** (1080×1350 fixed coordinate canvas, two-tier `ResizeObserver` scale wrapper, and isolated DOM-to-canvas/image rasterization POC).
 
+---
+
+## Stage 07: Fixed Poster Canvas, Responsive Scaling and Export Proof of Concept
+
+* **Date:** 20 October 2026
+* **Status:** Complete (Gate G3 Passed)
+* **Git Commit / Branch:** HEAD (master)
+
+### 1. Summary of Changes
+1. **Master Dimension Constants & Pure Scaling Engine ([`src/features/canvas/constants.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/canvas/constants.ts))**:
+   - Pinned master canvas dimensions to 1080 × 1350 px (4:5 portrait social feed) per Production Decision 01.
+   - Built pure scaling math calculation (`calculateCanvasScale`) that accounts for container width/height, padding, clamps to positive minimums, and strictly preserves 4:5 aspect ratio without layout overflow.
+2. **Two-Tier Responsive Viewport Wrapper ([`src/features/canvas/`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/canvas))**:
+   - `useResponsiveCanvas`: React hook utilizing `ResizeObserver` with `requestAnimationFrame` debouncing to re-calculate scale factors on container resizing and mobile orientation shifts.
+   - `PosterCanvas`: Fixed 1080 × 1350 px coordinate space artwork root with reset styles to prevent UI theme bleeding into posters.
+   - `CanvasViewport`: Two-tier responsive wrapper where Tier 1 reserves `displayWidth × displayHeight` in the document flow, while Tier 2 applies `transform: scale(...)` from origin `(0, 0)`. Ensures zoom controls, dimension badges, and chrome remain outside the scaled artwork DOM.
+3. **Isolated Exporter Service Boundary ([`src/features/export/`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/export))**:
+   - Formalized `PosterExporter` interface and `ExportResult` / `ExportOptions` contracts per TDD page 35.
+   - Built `HtmlToImagePosterExporter` (`exporter-adapter.ts`) wrapping `html-to-image`: awaits `document.fonts.ready` before rasterizing, enforces unscaled 1080 × 1350 px master output, strips transient CSS transforms, excludes elements marked `data-export-ignore="true"`, and validates non-empty Blob output.
+   - Implemented `export-utils.ts`: clean filename generation per Decision 09 (`Ozone-Lounge-[Day]-[Template]-[Title].[ext]`) and safe browser download with automatic object URL revocation.
+4. **Interactive Diagnostic Test Harness ([`src/components/canvas/DiagnosticCanvasPoc.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/canvas/DiagnosticCanvasPoc.tsx))**:
+   - Mounted interactive POC at `/diagnostic/canvas-poc` with width simulation buttons (360px Small Mobile, 390px iPhone, 768px Tablet, Full Auto), real-time scale/dimension telemetry, test artwork featuring custom fonts (`Bebas Neue`, `Source Sans 3`, `Inter`), development logo placeholder, and one-click PNG/JPEG downloads with binary dimension inspection.
+   - Added direct navigation button on `/app/templates`.
+5. **Automated Verification Suite ([`scripts/test-canvas-export.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/scripts/test-canvas-export.ts))**:
+   - Built 19-test standalone suite covering scaling math, aspect ratio preservation across devices, bounds clamping, master constants, filename sanitization, error structures, and binary PNG header inspection (1080 × 1350 px via `image-size`).
+
+### 2. Files Added, Changed, or Deleted
+* **Added**:
+  * [`src/features/canvas/constants.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/canvas/constants.ts): Master dimensions (1080x1350, 4:5) and pure scaling math.
+  * [`src/features/canvas/use-responsive-canvas.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/canvas/use-responsive-canvas.ts): ResizeObserver scale hook.
+  * [`src/features/canvas/PosterCanvas.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/canvas/PosterCanvas.tsx): Fixed 1080x1350 master coordinate root element.
+  * [`src/features/canvas/CanvasViewport.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/canvas/CanvasViewport.tsx): Two-tier layout box & visual scale wrapper.
+  * [`src/features/export/types.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/export/types.ts): Exporter adapter interface and result types.
+  * [`src/features/export/exporter-adapter.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/export/exporter-adapter.ts): `html-to-image` rasterizer implementation with font preflight.
+  * [`src/features/export/export-utils.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/features/export/export-utils.ts): Filename sanitizer and blob downloader.
+  * [`src/components/canvas/DiagnosticCanvasPoc.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/components/canvas/DiagnosticCanvasPoc.tsx): Interactive POC test component.
+  * [`src/app/diagnostic/canvas-poc/page.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/app/diagnostic/canvas-poc/page.tsx): Standalone test harness route.
+  * [`scripts/test-canvas-export.ts`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/scripts/test-canvas-export.ts): 19-assertion automated CLI test suite.
+* **Changed**:
+  * `package.json` & `package-lock.json`: Added `html-to-image` dependency.
+  * [`src/app/app/templates/page.tsx`](file:///c:/Users/admin/Desktop/antigravity%20projects/ozone%20poster%20generator/src/app/app/templates/page.tsx): Added direct navigation button to the Canvas & Export POC.
+* **Deleted**: None.
+
+### 3. Commands Actually Executed and Outcomes
+* `cmd /c npm install html-to-image`: Installed v1.11.13 (PASS).
+* `cmd /c npx tsx scripts/test-canvas-export.ts`: 19/19 tests passed (PASS).
+* `cmd /c npm run type-check`: 0 TypeScript errors (PASS).
+* `cmd /c npm run lint`: 0 ESLint warnings or errors (PASS).
+* `cmd /c npm run build`: 11 routes compiled cleanly in 8.5s (PASS).
+* `cmd /c npx tsx scripts/test-fonts-and-assets.ts`: 5/5 regression suites passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 registry tests passed (PASS).
+* `node -e "fetch('http://localhost:3005/diagnostic/canvas-poc')..."`: Returned HTTP 200 OK (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Canvas scales correctly on narrow, tall and desktop containers without pushing layout out of view** | **PASS** | Verified in `scripts/test-canvas-export.ts` Suite 2 across 360px, 390px, 768px, and 1920px container dimensions. Display width/height never exceeds available container bounds. |
+| **Exported test file has exact configured master dimensions regardless of screen size or current scale** | **PASS** | Verified in `scripts/test-canvas-export.ts` Suite 5 via `image-size` decoding binary header (`1080 × 1350 px`), and in `exporter-adapter.ts` which forces `canvasWidth: 1080, canvasHeight: 1350, pixelRatio: 1`. |
+| **Export excludes controls and app background** | **PASS** | `PosterCanvas` isolates artwork root; `CanvasViewport` keeps dimension badges and zoom controls outside Tier 2 DOM; `filter` in `exporter-adapter.ts` strips any `data-export-ignore="true"` nodes. |
+| **A failure is reported clearly; it does not create a blank file silently** | **PASS** | `ExportError` throws with explicit error codes (`TARGET_NOT_FOUND`, `DIMENSION_MISMATCH`, `FONTS_NOT_READY`, `RASTERIZE_FAILED`, `CORRUPT_OUTPUT`) and zero-byte blob rejection. |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY fixed-coordinate canvas, two-tier responsive viewport scaling, exporter adapter, and diagnostic POC.
+* Did NOT build the full mobile editor controls or seven template layouts (scheduled for Stage 08 & Stage 09+).
+* Preserved working auth, database, shell, and registry foundations.
+
+### 6. Recommended Next Stage
+**Stage 08 — Shared editor state and mobile control framework** (single poster document state with typed actions, mobile-first editor sections for Event Details, Lineup, Offer, Artwork, Typography, Colours, and Publishing Details, with dirty-state tracking).
+
+

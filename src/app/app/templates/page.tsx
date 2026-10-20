@@ -23,6 +23,11 @@ export default function TemplatesPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/diagnostic/canvas-poc">
+            <Button variant="secondary" size="sm" className="border-amber-500/40 text-amber-300 hover:bg-amber-500/10">
+              Canvas & Export POC
+            </Button>
+          </Link>
           <Link href="/app/drafts">
             <Button variant="outline" size="sm">
               View Saved Drafts
