@@ -892,5 +892,74 @@ Implemented the dedicated **Saint Template (Tuesday African Night / Afrobeat)** 
 ### 6. Recommended Next Stage
 **Stage 14 — Lannister Template (Wednesday Groovy Wednesday / Disco / Dual-offer)**: Implement the Wednesday Groovy Wednesday template renderer, disco glow & lighting motifs, and dual-offer layout (Free koroga chicken primary + bottle/beer discounts secondary).
 
+---
+
+## 2026-10-20 — Stage 14: Lannister Template (Wednesday Groovy Wednesday / Disco / Dual-offer)
+
+### 1. Goal
+Implement the third dedicated daily composition renderer: **Lannister** for **Wednesday Groovy Wednesday**, strictly following Blueprint Section 4.4 and TDD specifications (pages 86–87).
+
+Deliver a visually loud midweek disco party aesthetic with neon glow, lighting rhythm, resident DJs (**DJ Donben & DJ Vin**), and a strict **dual-offer layout** that clearly isolates the primary food highlight (**"Free koroga chicken on the house."**) from the secondary drink discounts (**"Discounts on whiskey bottles, cognac and beer buckets."**), preventing dense text paragraphs.
+
+### 2. Implementation Summary
+* **Lannister Vector Thumbnail** (`public/template-thumbnails/lannister.svg`): Created 400 × 500 px vector thumbnail with deep ultraviolet night background (`#090514`), central disco spotlight cone, mirrored laser beams, glowing neon border accents, hanging disco ball motif, "GROOVY WEDNESDAY" headline, dual-offer teaser badges ("FREE KOROGA CHICKEN" & "WHISKEY & COGNAC SPECIALS"), and DJ panel teaser.
+* **Template Registry Refinements** (`src/features/templates/registry.ts`):
+  * Attached `thumbnailUrl: "/template-thumbnails/lannister.svg"`.
+  * Refined typography pairing presets: `disco-expanded` (`Bebas Neue` display + `Inter` body/labels) and `neon-punch` (`Source Sans 3` display + `Inter` body + `Bebas Neue` labels).
+  * Configured default decoration tokens: `{ glowStrength: "high", showDiscoGrid: true }`.
+* **Lannister Template Component** (`src/components/poster/templates/LannisterTemplate.tsx`):
+  * Master dimensions: unscaled 1080 × 1350 px canvas (`data-testid="lannister-template-root"`).
+  * Layer 1: SVG disco atmosphere, subtle dancefloor grid pattern, radial glow orb, central spotlight cone, radiant laser beams/light trails, and neon tube perimeter frames with corner brackets.
+  * Layer 2: Hero background image slot (`assets.backgroundAssetId`) with focal point positioning (`focalPoints.background`), luminosity blend, and radial vignette overlay.
+  * Layer 3: Header branding ("OZONE LOUNGE"), "WEDNESDAY DISCO" subtag, animated pulsing day badge, and optional date/time tags.
+  * Layer 4: Disco ball graphic accent with facet grid, oversized "GROOVY WEDNESDAY" headline with neon gradient fill and glow drop-shadow, and equalizer rhythm subtitle bar.
+  * Layer 5: **Dual-Offer Architecture (Strict Separation)**:
+    * Primary food card: "Free koroga chicken on the house." with VIP gold tag, star icon, "ON THE HOUSE" pill, and high-contrast styling.
+    * Secondary beverage strip: "Discounts on whiskey bottles, cognac and beer buckets." with cocktail icon and neon border.
+    * Independent conditional rendering and dynamic layout rebalancing if either or both offers are blanked.
+  * Layer 6: High-contrast DJ panel separating **DJ Donben & DJ Vin** from surrounding promotional copy, complete with "ON THE DECKS" badge and equalizer wave accent.
+  * Layer 7: Footer with Ozone Lounge branding, operational logistics, and `@ozonelounge` social handle.
+  * Layout options: `neon-glow-center` (centered disco spotlight) vs `separated-offer-card` (asymmetric split).
+  * Glow strength presets: `low`, `medium`, `high`.
+* **Renderer Resolver Integration** (`src/features/templates/renderers.tsx`):
+  * Mapped `lannister: LannisterTemplate` in `TEMPLATE_RENDERERS`.
+* **Comprehensive Test Suite** (`scripts/test-lannister-template.ts`):
+  * 39/39 automated tests passing across 8 test suites.
+* **Regression & Build Verification**:
+  * All regression test suites passed (Saint 30/30, Batch Export 33/33, Draft Persistence 16/16, Reddington 20/20, Registry 5/5).
+  * Next.js production build (`npm run build`) succeeded in 9.6s with 19 static/dynamic routes.
+  * Live HTTP smoke tests verified on port 3005.
+
+### 3. Verification Commands & Results
+* `cmd /c npx tsx scripts/test-lannister-template.ts`: 39/39 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-saint-template.ts`: 30/30 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-batch-export.ts`: 33/33 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-draft-persistence.ts`: 16/16 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-reddington-vertical-slice.ts`: 20/20 tests passed (PASS).
+* `cmd /c npx tsx scripts/test-registry.ts`: 5/5 tests passed (PASS).
+* `cmd /c npm run build`: Compiled 19 routes cleanly in 9.6s (PASS).
+* `Live smoke test (port 3005)`: Health (200), Lannister thumbnail (200), Auth login (200), Templates gallery (200), Lannister editor route (200) (PASS).
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Lannister template renderer implemented (Blueprint 4.4)** | **PASS** | `LannisterTemplate.tsx` mounts 1080×1350 px unscaled master canvas with midweek disco party aesthetic and neon glow. |
+| **Dual-offer layout strictly separated** | **PASS** | Primary "Free koroga chicken on the house." and secondary "Discounts on whiskey bottles, cognac and beer buckets." rendered in distinct high-contrast cards, tested in `test-lannister-template.ts` Suite 5 & 6. |
+| **Three curated palette presets verified** | **PASS** | Ultraviolet Club, Lime & Magenta, and Cyan After Dark verified in Suite 2. |
+| **Two layout options (neon-glow-center vs separated-offer-card)** | **PASS** | Tested in Suite 4; both layout treatments supported with configurable glow strengths (`low`, `medium`, `high`). |
+| **Verbatim copy & artist lineup integrity** | **PASS** | "Groovy Wednesday", "DJ Donben & DJ Vin", "Free koroga chicken on the house.", and bottle discounts verified in Suite 5. |
+| **Conditional layout rebalancing** | **PASS** | Verified in Suite 6: blank offers, custom multi-artist lineups, or blank logistics rebalance cleanly without breaking composition. |
+| **Dedicated vector thumbnail in template gallery** | **PASS** | `lannister.svg` created, linked in registry, and verified in gallery (/app/templates). |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Lannister Template (Wednesday Groovy Wednesday / Disco / Dual-offer).
+* Did NOT implement templates 4–7 (Shelby, Lothbrok, Escobar, Pinkman); reserved for Stages 15–18.
+* Preserved working auth, database, app shell, font, editor, and export foundations.
+
+### 6. Recommended Next Stage
+**Stage 15 — Shelby Template (Thursday Karaoke Night / Stage / Performers)**: Implement the Thursday Karaoke Night template renderer, theatrical stage spotlights, microphone accents, and dedicated separated fields for hosts and DJs.
+
+
 
 

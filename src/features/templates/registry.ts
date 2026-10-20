@@ -291,6 +291,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     tag: "Best for Midweek Groove",
     description: "Groovy disco aesthetics, neon lights and dance-floor energy.",
     templateVersion: 1,
+    thumbnailUrl: "/template-thumbnails/lannister.svg",
     palettePresets: [
       {
         id: "ultraviolet-club",
@@ -324,9 +325,16 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
       {
         id: "disco-expanded",
         name: "Disco Headline & Modern Sans",
-        displayFont: "sans-serif",
-        bodyFont: "sans-serif",
-        labelFont: "sans-serif",
+        displayFont: "Bebas Neue",
+        bodyFont: "Inter",
+        labelFont: "Inter",
+      },
+      {
+        id: "neon-punch",
+        name: "Neon Punch & Condensed",
+        displayFont: "Source Sans 3",
+        bodyFont: "Inter",
+        labelFont: "Bebas Neue",
       },
     ],
     layoutOptions: [
@@ -360,7 +368,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
         paletteId: "ultraviolet-club",
         typographyPresetId: "disco-expanded",
         layoutOptionId: "neon-glow-center",
-        decorationOptions: { glowStrength: "high" },
+        decorationOptions: { glowStrength: "high", showDiscoGrid: true },
         focalPoints: { background: { x: 0.5, y: 0.5 } },
       },
     },

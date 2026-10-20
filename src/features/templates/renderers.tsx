@@ -11,6 +11,7 @@ import React from "react";
 import { TemplateId, PosterDocument } from "../poster/schema";
 import { ReddingtonTemplate } from "@/components/poster/templates/ReddingtonTemplate";
 import { SaintTemplate } from "@/components/poster/templates/SaintTemplate";
+import { LannisterTemplate } from "@/components/poster/templates/LannisterTemplate";
 
 export type TemplateRendererComponent = React.ComponentType<{
   document: PosterDocument;
@@ -40,7 +41,7 @@ function PlaceholderTemplateRenderer({ document }: { document: PosterDocument })
 const TEMPLATE_RENDERERS: Record<TemplateId, TemplateRendererComponent> = {
   reddington: ReddingtonTemplate,
   saint: SaintTemplate,
-  lannister: PlaceholderTemplateRenderer,
+  lannister: LannisterTemplate,
   shelby: PlaceholderTemplateRenderer,
   lothbrok: PlaceholderTemplateRenderer,
   escobar: PlaceholderTemplateRenderer,
