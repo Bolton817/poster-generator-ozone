@@ -15,6 +15,7 @@ import { LannisterTemplate } from "@/components/poster/templates/LannisterTempla
 import { ShelbyTemplate } from "@/components/poster/templates/ShelbyTemplate";
 import { LothbrokTemplate } from "@/components/poster/templates/LothbrokTemplate";
 import { EscobarTemplate } from "@/components/poster/templates/EscobarTemplate";
+import { PinkmanTemplate } from "@/components/poster/templates/PinkmanTemplate";
 
 export type TemplateRendererComponent = React.ComponentType<{
   document: PosterDocument;
@@ -48,7 +49,7 @@ const TEMPLATE_RENDERERS: Record<TemplateId, TemplateRendererComponent> = {
   shelby: ShelbyTemplate,
   lothbrok: LothbrokTemplate,
   escobar: EscobarTemplate,
-  pinkman: PlaceholderTemplateRenderer,
+  pinkman: PinkmanTemplate,
 };
 
 /**

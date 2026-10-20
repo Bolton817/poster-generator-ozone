@@ -659,6 +659,7 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     tag: "Best for Old Skool Sundays",
     description: "Throwback music, vinyl records, nostalgic classics and relaxed Sunday vibes.",
     templateVersion: 1,
+    thumbnailUrl: "/template-thumbnails/pinkman.svg",
     palettePresets: [
       {
         id: "amber-memory",
@@ -690,18 +691,25 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
     ],
     typographyPresets: [
       {
-        id: "throwback-nostalgia",
-        name: "Vintage Headline & Clean Body",
-        displayFont: "serif",
-        bodyFont: "sans-serif",
-        labelFont: "sans-serif",
+        id: "retro-vintage",
+        name: "Vintage Groovy & Editorial",
+        displayFont: "Bebas Neue",
+        bodyFont: "Inter",
+        labelFont: "Source Sans 3",
+      },
+      {
+        id: "analog-classic",
+        name: "Classic Analog Sans",
+        displayFont: "Source Sans 3",
+        bodyFont: "Inter",
+        labelFont: "Bebas Neue",
       },
     ],
     layoutOptions: [
-      { id: "cassette-vinyl-motif", name: "Vinyl / Cassette Motif" },
-      { id: "nostalgic-grid", name: "Nostalgic Grid" },
+      { id: "vinyl-grooves", name: "Vinyl Grooves & Turntable" },
+      { id: "retro-cassette", name: "Analog Cassette & Tape" },
     ],
-    supportedImageSlots: ["background", "texture"],
+    supportedImageSlots: ["background"],
     defaults: {
       schemaVersion: 1,
       templateId: "pinkman",
@@ -726,9 +734,9 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
       assets: { logoAssetId: null, backgroundAssetId: null, secondaryAssetIds: [] },
       styling: {
         paletteId: "amber-memory",
-        typographyPresetId: "throwback-nostalgia",
-        layoutOptionId: "cassette-vinyl-motif",
-        decorationOptions: { showRecordGrooves: true },
+        typographyPresetId: "retro-vintage",
+        layoutOptionId: "vinyl-grooves",
+        decorationOptions: { vinylRecord: true, vintageGrooves: true, warmTexture: true },
         focalPoints: { background: { x: 0.5, y: 0.5 } },
       },
     },

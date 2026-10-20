@@ -1157,7 +1157,76 @@ Implement the sixth dedicated daily template, **Escobar (Saturday Fiesta)**, bri
 * Preserved working auth, database, app shell, font, editor, and export foundations.
 
 ### 6. Recommended Next Stage
-**Stage 18 — Pinkman Template (Sunday Old Skool Sundays / Nostalgic Vinyl / Vintage Beer Bucket)**: Implement the final Sunday template renderer with nostalgic vinyl and cassette motifs, textured retro backdrop, and vintage beer-bucket offer handling (Discounts on beer buckets).
+**Stage 18 — Pinkman Template (Sunday Old Skool Sundays / Nostalgic Vinyl / Vintage Beer Bucket)**: Completed below.
+
+---
+
+## Stage 18: Pinkman Template (Sunday Old Skool Sundays / Nostalgic Vinyl / Vintage Beer Bucket) & 7-Day Fleet Completion
+
+**Status:** COMPLETE  
+**Date:** 2026-10-20  
+**TDD Reference:** Stage 18, Pages 90–91  
+**Blueprint Reference:** Section 4.8 (Pinkman — Sunday Old Skool Sundays) & Section 4.9  
+
+### 1. Goal
+Implement the seventh and final dedicated daily template, **Pinkman (Sunday Old Skool Sundays)**, bringing a relaxed nostalgic music and vinyl culture aesthetic governed by Blueprint Section 4.8. Features authentic concentric vinyl record grooves, center turntable spindle with 45 RPM adapter, analog audio tape styling, prominent resident performer billing (**DJ Ngash**), beer bucket promotional offer handling (**"Discounts on beer buckets."**), dedicated vector thumbnail, and complete fleet-wide verification across all 7 days (Monday–Sunday).
+
+### 2. Architecture & Design Decisions
+1. **Master Coordinate & Canvas System**:
+   - Master 1080 × 1350 px unscaled canvas (`data-testid="pinkman-template-root"`).
+   - Strict 4:5 aspect ratio preserving high-resolution print and digital social export fidelity.
+2. **Vinyl Turntable & Analog Tape Atmosphere**:
+   - `Vinyl Grooves & Turntable` layout: concentric sound grooves, vinyl center spindle label with 45 RPM adapter motif, turntable tonearm sweep, and warm amber aura.
+   - `Analog Cassette & Tape` layout: vintage magnetic cassette spools, tape counter markers, and nostalgic analog studio aesthetic.
+   - Configurable decoration options: `vinylRecord`, `vintageGrooves`, `warmTexture`.
+3. **Talent & Performer Billing**:
+   - Resident performer: **DJ Ngash** featured as the Resident Vinyl Selecta / Old Skool Specialist with custom vinyl record badge and 45 RPM speed indicator.
+4. **Beer Bucket Promotional Offer Handling**:
+   - Curated offer card for **"Discounts on beer buckets."** with stylized ice bucket and cold beer bottle silhouettes.
+   - If offers are cleared, the layout gracefully collapses the container without rendering dummy placeholder text ("No special offer provided yet").
+5. **Three Curated Sunday Palettes**:
+   - **Amber Memory**: Warm Amber-Gold (`#d97706`), Chestnut (`#b45309`), Bright Amber (`#f59e0b`), Vintage Sepia (`#1c1407`), Warm Cream (`#fef3c7`).
+   - **Faded Teal**: Vintage Teal (`#14b8a6`), Deep Teal (`#0f766e`), Bright Aqua (`#2dd4bf`), Retro Dusk (`#041a18`), Pale Teal (`#ccfbf1`).
+   - **Brick & Cream**: Terracotta Brick (`#dc2626`), Burnt Orange (`#ea580c`), Warm Linen (`#fed7aa`), Dark Espresso (`#1a0808`), Cream Linen (`#fff7ed`).
+6. **Dedicated Vector Thumbnail**:
+   - `public/template-thumbnails/pinkman.svg` (400 × 500 px) with concentric vinyl grooves, center turntable spindle, 45 RPM adapter, Old Skool Sundays title, DJ Ngash, and beer bucket callout.
+7. **Fleet-Wide Milestone**:
+   - All 7 daily templates across the week are now custom-rendered with distinct creative signatures:
+     1. Monday: **Reddington** (Old Classics & Sundowners / Sunset Ember)
+     2. Tuesday: **Saint** (African Night Afro / Saffron & Ink)
+     3. Wednesday: **Lannister** (Groovy Wednesday / Ultraviolet Dual-Offer)
+     4. Thursday: **Shelby** (Karaoke Night / Theatrical Stage Roles)
+     5. Friday: **Lothbrok** (Flight Fridays / Metallic Speed Offer-Free Rebalance)
+     6. Saturday: **Escobar** (Saturday Fiesta / Layered Color Blocks & Light Orbs)
+     7. Sunday: **Pinkman** (Old Skool Sundays / Nostalgic Vinyl & Beer Buckets)
+   - Zero placeholder renderers remaining in the system.
+
+### 3. Deliverables & Files Changed
+* `public/template-thumbnails/pinkman.svg`: Dedicated 400 × 500 px vector thumbnail.
+* `src/features/templates/registry.ts`: Linked thumbnail, refined typography (`retro-vintage`, `analog-classic`) and layout presets (`vinyl-grooves`, `retro-cassette`).
+* `src/components/poster/templates/PinkmanTemplate.tsx`: 1080 × 1350 px unscaled canvas composition.
+* `src/features/templates/renderers.tsx`: Mapped `pinkman: PinkmanTemplate` (all 7 renderers now active).
+* `scripts/test-pinkman-template.ts`: 64 automated unit, SSR, and fleet milestone tests (64/64 passed).
+* `scratch/smoke-test-pinkman.ts`: Live smoke test verified on port 3005 across all 7 templates.
+
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Pinkman template renderer implemented (Blueprint 4.8)** | **PASS** | `PinkmanTemplate.tsx` mounts 1080×1350 px unscaled master canvas with nostalgic vinyl grooves and warm retro atmosphere. |
+| **Talent billing for DJ Ngash** | **PASS** | Resident performer DJ Ngash rendered with prominent vinyl badge and 45 RPM indicator. |
+| **Beer bucket offer handling** | **PASS** | "Discounts on beer buckets." rendered with ice bucket/bottle card; collapses cleanly if cleared. |
+| **Three curated palette presets verified** | **PASS** | Amber Memory, Faded Teal, and Brick & Cream verified in Suite 2. |
+| **Two layout options (vinyl-grooves vs retro-cassette)** | **PASS** | Both layout options supported with configurable decorative accents in Suite 3. |
+| **Verbatim copy & artist lineup integrity** | **PASS** | "Old Skool Sundays", "DJ Ngash", and beer bucket discounts verified in Suite 4. |
+| **Conditional layout rebalancing & schema validity** | **PASS** | Verified in Suite 5 & 8: cleared offers, custom offers, and custom lineups rebalance cleanly. |
+| **Fleet-wide milestone: all 7 templates custom mapped** | **PASS** | Verified in Suite 9: 7/7 templates active, zero placeholders remaining. |
+| **Dedicated vector thumbnail in template gallery** | **PASS** | `pinkman.svg` created, linked in registry, and verified in gallery (/app/templates). |
+
+### 5. Confirmation of Boundary
+* All 7 daily template compositions from Monday to Sunday are now fully implemented and verified.
+* Preserved working auth, database, app shell, font, editor, and export foundations.
+
 
 
 
