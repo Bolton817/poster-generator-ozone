@@ -41,8 +41,7 @@ export function LoginForm() {
             setLoading(false);
           },
           onSuccess: () => {
-            router.push(callbackUrl);
-            router.refresh();
+            window.location.href = callbackUrl;
           },
         }
       );

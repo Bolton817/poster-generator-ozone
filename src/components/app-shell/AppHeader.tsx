@@ -37,13 +37,12 @@ export function AppHeader({ user, title = "Ozone Lounge" }: AppHeaderProps) {
       await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {
-            router.push("/login");
-            router.refresh();
+            window.location.href = "/login";
           },
         },
       });
     } catch {
-      router.push("/login");
+      window.location.href = "/login";
     }
   };
 
