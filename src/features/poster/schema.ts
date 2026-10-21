@@ -33,19 +33,19 @@ export type CanvasConfig = z.infer<typeof CanvasConfigSchema>;
 // ----------------------------------------------------
 
 export const PosterContentSchema = z.object({
-  dayLabel: z.string(),
-  eventTitle: z.string().min(1, "Event title is required"),
-  dateText: z.string().default(""),
-  startTime: z.string().default(""),
-  venueName: z.string().default("Ozone Lounge"),
-  locationText: z.string().default(""),
-  contactText: z.string().default(""),
-  socialHandle: z.string().default("@ozonelounge"),
-  primaryOffer: z.string().default(""),
-  secondaryOffer: z.string().default(""),
-  djNames: z.array(z.string()).default([]),
-  hostNames: z.array(z.string()).default([]),
-  customLines: z.array(z.string()).default([]),
+  dayLabel: z.string().max(50),
+  eventTitle: z.string().min(1, "Event title is required").max(150, "Event title too long"),
+  dateText: z.string().max(100).default(""),
+  startTime: z.string().max(50).default(""),
+  venueName: z.string().max(100).default("Ozone Lounge"),
+  locationText: z.string().max(150).default(""),
+  contactText: z.string().max(100).default(""),
+  socialHandle: z.string().max(100).default("@ozonelounge"),
+  primaryOffer: z.string().max(300).default(""),
+  secondaryOffer: z.string().max(300).default(""),
+  djNames: z.array(z.string().max(100)).max(20).default([]),
+  hostNames: z.array(z.string().max(100)).max(20).default([]),
+  customLines: z.array(z.string().max(200)).max(20).default([]),
 });
 
 export type PosterContent = z.infer<typeof PosterContentSchema>;
@@ -97,7 +97,7 @@ export const PosterDocumentSchema = z.object({
   schemaVersion: z.literal(1),
   templateId: TemplateIdSchema,
   templateVersion: z.number().int().positive().default(1),
-  name: z.string().min(1, "Draft name cannot be empty"),
+  name: z.string().min(1, "Draft name cannot be empty").max(200, "Draft name cannot exceed 200 characters"),
   canvas: CanvasConfigSchema,
   content: PosterContentSchema,
   assets: PosterAssetsSchema,

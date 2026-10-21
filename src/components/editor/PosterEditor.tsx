@@ -19,6 +19,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { FullScreenPreviewModal } from "@/components/preview/FullScreenPreviewModal";
 import { ExportModal } from "@/components/export/ExportModal";
 import { TemplateSwitcher } from "./TemplateSwitcher";
+import { EditorErrorBoundary } from "./EditorErrorBoundary";
 import { useAutoSave } from "@/features/drafts/use-auto-save";
 import {
   ArrowLeft,
@@ -352,11 +353,13 @@ export function PosterEditor({ draftId: initialDraftId }: PosterEditorProps = {}
             className="w-full h-full max-w-2xl max-h-[95%] flex items-center justify-center cursor-pointer group"
             title="Click to open full-screen preview"
           >
-            <CanvasViewport showBadge={true} padding={16}>
-              <PosterCanvas ref={canvasRef}>
-                <Renderer document={document} />
-              </PosterCanvas>
-            </CanvasViewport>
+            <EditorErrorBoundary fallbackTitle="Poster Canvas Error">
+              <CanvasViewport showBadge={true} padding={16}>
+                <PosterCanvas ref={canvasRef}>
+                  <Renderer document={document} />
+                </PosterCanvas>
+              </CanvasViewport>
+            </EditorErrorBoundary>
           </div>
         </div>
 
@@ -385,7 +388,9 @@ export function PosterEditor({ draftId: initialDraftId }: PosterEditorProps = {}
 
           {/* Scrollable Accordion Section List */}
           <div className="flex-1 overflow-y-auto p-4">
-            <EditorSectionList />
+            <EditorErrorBoundary fallbackTitle="Editor Controls Error">
+              <EditorSectionList />
+            </EditorErrorBoundary>
           </div>
         </div>
       </div>
