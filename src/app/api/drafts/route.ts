@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { PosterDocumentSchema } from "@/features/poster/schema";
+import { logger } from "@/lib/logger";
 
 /**
  * GET /api/drafts
@@ -40,7 +41,7 @@ export async function GET() {
 
     return NextResponse.json({ ok: true, drafts });
   } catch (error: unknown) {
-    console.error("[API /api/drafts GET] Database error:", error);
+    logger.error("drafts", "Failed to retrieve drafts from database", error, { userId: user.id });
     return NextResponse.json(
       {
         ok: false,
@@ -94,6 +95,10 @@ export async function POST(request: NextRequest) {
     // Validate PosterDocument structure
     const parseResult = PosterDocumentSchema.safeParse(document);
     if (!parseResult.success) {
+      logger.warn("drafts", "Draft creation schema validation failed", {
+        userId: user.id,
+        issues: parseResult.error.issues,
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -123,9 +128,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    logger.info("drafts", "Draft created successfully", {
+      draftId: draft.id,
+      templateId: draft.templateId,
+      name: draft.name,
+      userId: user.id,
+    });
+
     return NextResponse.json({ ok: true, draft }, { status: 201 });
   } catch (error: unknown) {
-    console.error("[API /api/drafts POST] Database error:", error);
+    logger.error("drafts", "Failed to create draft in database", error, { userId: user.id });
     return NextResponse.json(
       {
         ok: false,

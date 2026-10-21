@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { PosterDocumentSchema } from "@/features/poster/schema";
+import { logger } from "@/lib/logger";
 
 interface RouteContext {
   params: Promise<{ draftId: string }>;
@@ -54,7 +55,7 @@ export async function GET(
 
     return NextResponse.json({ ok: true, draft });
   } catch (error: unknown) {
-    console.error(`[API /api/drafts/${draftId} GET] Database error:`, error);
+    logger.error("drafts", `Failed to retrieve draft ${draftId} from database`, error, { draftId, userId: user.id });
     return NextResponse.json(
       {
         ok: false,
@@ -161,9 +162,15 @@ export async function PUT(
       },
     });
 
+    logger.info("drafts", `Draft ${draftId} updated successfully`, {
+      draftId,
+      name: updatedDraft.name,
+      userId: user.id,
+    });
+
     return NextResponse.json({ ok: true, draft: updatedDraft });
   } catch (error: unknown) {
-    console.error(`[API /api/drafts/${draftId} PUT] Database error:`, error);
+    logger.error("drafts", `Failed to update draft ${draftId} in database`, error, { draftId, userId: user.id });
     return NextResponse.json(
       {
         ok: false,
@@ -222,12 +229,17 @@ export async function DELETE(
       );
     }
 
+    logger.info("drafts", `Draft ${draftId} deleted successfully`, {
+      draftId,
+      userId: user.id,
+    });
+
     return NextResponse.json({
       ok: true,
       message: "Draft deleted successfully.",
     });
   } catch (error: unknown) {
-    console.error(`[API /api/drafts/${draftId} DELETE] Database error:`, error);
+    logger.error("drafts", `Failed to delete draft ${draftId} from database`, error, { draftId, userId: user.id });
     return NextResponse.json(
       {
         ok: false,

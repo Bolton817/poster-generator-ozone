@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/db";
 import { PosterDocument } from "@/features/poster/schema";
+import { logger } from "@/lib/logger";
 
 interface RouteContext {
   params: Promise<{ draftId: string }>;
@@ -72,9 +73,15 @@ export async function POST(
       },
     });
 
+    logger.info("drafts", `Draft ${draftId} duplicated to ${duplicate.id}`, {
+      sourceDraftId: draftId,
+      newDraftId: duplicate.id,
+      userId: user.id,
+    });
+
     return NextResponse.json({ ok: true, draft: duplicate }, { status: 201 });
   } catch (error: unknown) {
-    console.error(`[API /api/drafts/${draftId}/duplicate POST] Database error:`, error);
+    logger.error("drafts", `Failed to duplicate draft ${draftId} in database`, error, { draftId, userId: user.id });
     return NextResponse.json(
       {
         ok: false,

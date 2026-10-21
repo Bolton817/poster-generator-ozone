@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { ALLOWED_MIME_TYPES, MAX_UPLOAD_SIZE_BYTES } from "@/features/assets/slot-policy";
 import { validateImageMagicBytes, sanitizeFilename } from "@/features/assets/upload-sanitizer";
 import { imageSize } from "image-size";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   // 1. Enforce Authentication
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
       width = dimensions.width ?? null;
       height = dimensions.height ?? null;
     } catch (dimErr) {
-      console.warn("[Upload] Could not decode image dimensions:", dimErr);
+      logger.warn("upload", "Could not decode image dimensions", { error: String(dimErr) });
       return NextResponse.json(
         {
           ok: false,
@@ -133,6 +134,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    logger.info("upload", "Asset uploaded and recorded successfully", {
+      assetId: mediaAsset.id,
+      storageKey: mediaAsset.storageKey,
+      fileSize: uploadResult.byteSize,
+      mimeType: file.type,
+      userId: user.id,
+    });
+
     return NextResponse.json(
       {
         ok: true,
@@ -141,7 +150,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("[Upload] Internal asset upload error:", error);
+    logger.error("upload", "Internal asset upload error", error, { userId: user.id });
     return NextResponse.json(
       {
         ok: false,

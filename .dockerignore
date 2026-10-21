@@ -1,0 +1,32 @@
+# Git & VCS
+.git
+.gitignore
+
+# Environment & Secrets (NEVER bake into image)
+.env
+.env*.local
+*.pem
+*.key
+
+# Local dependencies and build outputs
+node_modules
+.next
+out
+dist
+build
+
+# Project documentation & test scripts
+docs
+tests
+scratch
+coverage
+*.log
+
+# Editor & OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
