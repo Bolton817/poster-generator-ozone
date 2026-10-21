@@ -152,6 +152,13 @@ export const TEMPLATES_REGISTRY: Record<TemplateId, TemplateDefinition> = {
         bodyFont: "sans-serif",
         labelFont: "sans-serif",
       },
+      {
+        id: "classic-bold",
+        name: "Classic Bold & Clean Sans",
+        displayFont: "Bebas Neue",
+        bodyFont: "sans-serif",
+        labelFont: "sans-serif",
+      },
     ],
     layoutOptions: [
       { id: "full-bleed-sunset", name: "Full Bleed Sunset" },
