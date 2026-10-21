@@ -1227,10 +1227,71 @@ Implement the seventh and final dedicated daily template, **Pinkman (Sunday Old 
 * All 7 daily template compositions from Monday to Sunday are now fully implemented and verified.
 * Preserved working auth, database, app shell, font, editor, and export foundations.
 
+### 6. Recommended Next Stage
+**Stage 19 — Gallery, Template Switching and Cross-Template Polish**: Completed below.
 
+---
 
+## Stage 19: Gallery, Template Switching and Cross-Template Polish
 
+**Status:** COMPLETE  
+**Date:** 2026-10-21  
+**TDD Reference:** Stage 19, Pages 96–97  
+**Blueprint Reference:** Section 5 (Mobile-first UX), Section 6 & Section 7 (Template Registry)  
 
+### 1. Goal
+Complete the discoverability, template switching protection, and cross-template consistency layer across all seven daily templates. Deliver an interactive registry-driven gallery with day-segment filtering and instant search, a quick preview details modal, a full weekly visual contact sheet and content matrix modal, an in-editor template switching guard dialog preventing silent data loss when `isDirty === true`, enhanced drafts library filtering/sorting, and comprehensive automated verification (127/127 assertions passed).
 
+### 2. Architecture & Design Decisions
+1. **Single-Source Registry Invariant**:
+   - `getTemplatesInOrder()` and `ORDERED_TEMPLATE_IDS` in `src/features/templates/registry.ts` are the sole sources of truth.
+   - The gallery, modals, switcher, and matrix iterate dynamically over the registry with zero hardcoded card markup, guaranteeing that introducing template eight or nine requires zero UI rewrites.
+2. **Interactive Gallery Filtering & Search**:
+   - `TemplateGallery.tsx` provides day-segment filter pills: `All (7)`, `Weekdays (4)`, `Weekend (3)`.
+   - Real-time search queries match against template names, event titles, resident DJs/hosts, and tags.
+3. **Template Details & Contact Sheet Modals**:
+   - `TemplateDetailsModal.tsx`: modal displaying full 4:5 vector thumbnail, creative description, resident performers, promotional offer, palette swatches, and direct "Customize in Editor" button.
+   - `TemplateContactSheetModal.tsx`: full weekly contact sheet rendering all 7 templates side-by-side with master specs banner (1080 × 1350 px, 4:5 aspect ratio) and content matrix.
+4. **Template Switching Guard (TDD Pages 96–97 Invariant)**:
+   - `TemplateSwitcher.tsx` mounted directly in the `PosterEditor` header toolbar.
+   - If document is clean (`isDirty === false`): navigates directly to target template.
+   - If document has unsaved edits (`isDirty === true`): intercepted by `SwitchTemplateGuardDialog.tsx` offering:
+     - **Save Draft & Switch**: invokes `saveNow()` to persist state to Supabase, then navigates.
+     - **Discard Changes & Switch**: discards unsaved state and navigates.
+     - **Stay in Current Editor**: cancels navigation and preserves current editing session.
+5. **Drafts Library Filtering & Sorting**:
+   - `DraftsList.tsx` upgraded with dynamic template filter pills (`All`, `Reddington`, `Saint`, `Lannister`, `Shelby`, `Lothbrok`, `Escobar`, `Pinkman`) with real-time draft counts.
+   - Sorting dropdown supporting: `Recently Updated` (default), `Oldest First`, `Name (A–Z)`, and `Name (Z–A)`.
 
+### 3. Deliverables & Files Changed
+* `src/components/gallery/TemplateGallery.tsx`: Interactive registry-driven template gallery component.
+* `src/components/gallery/TemplateDetailsModal.tsx`: Detailed template inspection modal with palette swatches.
+* `src/components/gallery/TemplateContactSheetModal.tsx`: Weekly visual contact sheet & tabular content matrix.
+* `src/app/app/templates/page.tsx`: Updated route rendering `TemplateGallery`.
+* `src/components/editor/SwitchTemplateGuardDialog.tsx`: Confirmation dialog guarding against silent edit loss.
+* `src/components/editor/TemplateSwitcher.tsx`: Header toolbar template selector with guarded transitions.
+* `src/components/editor/PosterEditor.tsx`: Mounted `TemplateSwitcher` in editor toolbar.
+* `src/components/drafts/DraftsList.tsx`: Added template filter pills and multi-mode sorting dropdown.
+* `scripts/test-gallery-and-polish.ts`: 127 automated unit, guard, matrix, and extensibility assertions (127/127 passed).
+* `scratch/smoke-test-gallery-polish.ts`: Live smoke test verified on port 3005 across auth, gallery, drafts, and all 7 editor routes.
 
+### 4. Acceptance Criteria Verification
+
+| Criterion | Status | Evidence |
+| :--- | :--- | :--- |
+| **Seven templates appear in weekday order with correct tags and content** | **PASS** | Verified in `test-gallery-and-polish.ts` Suite 1: Monday through Sunday order, titles, tags, and thumbnails. |
+| **Each template is visually distinct in a contact sheet** | **PASS** | `TemplateContactSheetModal.tsx` renders all 7 templates with distinct palettes, layouts, and vector thumbnails. |
+| **Switching template never silently loses a dirty document** | **PASS** | `SwitchTemplateGuardDialog.tsx` intercepts transitions when `isDirty === true`, verified in Suite 3. |
+| **Gallery does not require a new hard-coded entry when template eight/nine is introduced** | **PASS** | Verified in Suite 4: mock 8th template renders seamlessly without markup modifications. |
+| **Drafts library filter and sorting logic** | **PASS** | Verified in Suite 5: template pills, date sorting, and alphabetical sorting tested. |
+| **Full regression suite across all 7 daily templates** | **PASS** | 10/10 regression test suites passed (Pinkman 64/64, Escobar 55/55, Lothbrok 37/37, Shelby 40/40, Lannister 39/39, Saint 30/30, Reddington 20/20, Batch Export 33/33, Draft Persistence 16/16, Registry 5/5). |
+| **Production build & lint clean** | **PASS** | `npm run build` compiled 19 routes in 6.6s; `npm run lint` reported 0 errors/warnings. |
+| **Live smoke test on port 3005** | **PASS** | `scratch/smoke-test-gallery-polish.ts` verified login, gallery, drafts, and all 7 editor routes. |
+
+### 5. Confirmation of Boundary
+* Implemented ONLY Stage 19: Gallery, template switching guard, and cross-template consistency/polish.
+* Did NOT implement Stage 20 (Security/Performance/Accessibility Audit) or Stage 21 (Deployment).
+* Preserved working auth, database, app shell, font, editor, and export foundations.
+
+### 6. Recommended Next Stage
+**Stage 20 — Security, Accessibility, Performance and Resilience Audit**: Run focused hardening pass across completed MVP before deployment (TDD Pages 98–99).

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { FullScreenPreviewModal } from "@/components/preview/FullScreenPreviewModal";
 import { ExportModal } from "@/components/export/ExportModal";
+import { TemplateSwitcher } from "./TemplateSwitcher";
 import { useAutoSave } from "@/features/drafts/use-auto-save";
 import {
   ArrowLeft,
@@ -161,14 +162,12 @@ export function PosterEditor({ draftId: initialDraftId }: PosterEditorProps = {}
 
           <div className="h-4 w-px bg-slate-800 shrink-0" />
 
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
-              {template.dayLabel}
-            </span>
-            <span className="text-sm font-bold text-slate-100 truncate">
-              {template.name}
-            </span>
-          </div>
+          <TemplateSwitcher
+            currentTemplateId={template.id}
+            isDirty={isDirty}
+            onSaveNow={saveNow}
+            isSaving={isSaving}
+          />
 
           {/* Auto-Save Status Indicator (Stage 11) */}
           <div className="hidden md:flex items-center gap-1.5 text-xs">

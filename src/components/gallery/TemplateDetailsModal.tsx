@@ -5,7 +5,7 @@ import Link from "next/link";
 import { TemplateDefinition } from "@/features/templates/registry";
 import { Dialog } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
-import { Calendar, Music, Sparkles, ArrowRight, Tag, Palette, Type } from "lucide-react";
+import { Music, Sparkles, ArrowRight, Palette, Type } from "lucide-react";
 
 export interface TemplateDetailsModalProps {
   template: TemplateDefinition | null;

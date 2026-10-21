@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { Calendar, ArrowRight, Search, Eye, Grid, X, LayoutGrid } from "lucide-react";
+import { Calendar, ArrowRight, Search, Eye, X, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { getTemplatesInOrder, TemplateDefinition } from "@/features/templates/registry";
